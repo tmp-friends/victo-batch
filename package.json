@@ -3,15 +3,17 @@
   "version": "1.0.0",
   "author": "Komekami <komekami0131@gmail.com>",
   "main": "dist/index.js",
-  "devDependencies": {
+  "dependencies": {
     "@google-cloud/functions-framework": "^3.1.2",
-    "typescript": "^4.9.4",
-    "tsc-watch": "^6.0.0"
+    "@prisma/client": "^4.8.0",
+    "dotenv": "^16.0.3",
+    "prisma": "^4.8.0",
+    "twitter-api-v2": "^1.12.10",
+    "typescript": "^4.9.4"
   },
   "scripts": {
     "build": "tsc",
-    "start": "tsc && functions-framework --target=helloWorld",
-    "watch": "tsc-watch --onSuccess \"npm run start\"",
+    "start": "tsc && functions-framework --target=insertFanartTweets",
     "test": "echo \"Error: no test specified\" && exit 1",
     "gcp-build": "npm run build"
   },
