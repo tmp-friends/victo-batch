@@ -58,7 +58,7 @@ export class Logic {
       end_time: todayMidnight,
       expansions: ['author_id', 'attachments.media_keys'],
       'tweet.fields': ['created_at', 'public_metrics'],
-      'media.fields': ['preview_image_url', 'url'],
+      'media.fields': ['preview_image_url', 'url', 'variants'],
     })
 
     return fanartTweets
@@ -78,12 +78,10 @@ export class Logic {
 
     // ISO規格
     // getMonth()は0はじまりのため1加算する必要あり
-    const yesterdayMidnight = `${date.getFullYear()}-${date.getMonth() + 1}-${
-      date.getDate() - 1
-    }T00:00:00+09:00`
-    const todayMidnight = `${date.getFullYear()}-${
-      date.getMonth() + 1
-    }-${date.getDate()}T00:00:00+09:00`
+    const yesterdayMidnight = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate() - 1
+      }T00:00:00+09:00`
+    const todayMidnight = `${date.getFullYear()}-${date.getMonth() + 1
+      }-${date.getDate()}T00:00:00+09:00`
 
     return [yesterdayMidnight, todayMidnight]
   }
@@ -105,7 +103,7 @@ export class Logic {
       const data: CreateTweetData = {
         hashtagId: id,
         tweetDataId: fanartTweet['id'],
-        text: 'a',
+        text: text,
         retweetCount: Number(fanartTweet['public_metrics']['retweet_count']),
         likeCount: Number(fanartTweet['public_metrics']['like_count']),
         authorId: fanartTweet['author_id'],
@@ -123,7 +121,8 @@ export class Logic {
       for await (const mediaField of mediaFields) {
         const mediaData: CreateMediaData = {
           type: mediaField['type'],
-          url: mediaField['url'],
+          // 画像以外のmedia_typeも考慮
+          url: mediaField['url'] ?? mediaField['variants'][0]['url'],
         }
         media.push(mediaData)
       }
