@@ -1,0 +1,21 @@
+version: "3.7"
+
+services:
+  batch:
+    image: tmp-friends/victo-batch:latest
+    container_name: victo-batch
+    ports:
+      - "8080:8080"
+    tty: true
+    volumes:
+      - ../..:/var/batch
+      - batch_node_modules:/var/batch/node_modules
+    networks:
+      - victo_network
+
+volumes:
+  batch_node_modules:
+
+networks:
+  victo_network:
+    external: true

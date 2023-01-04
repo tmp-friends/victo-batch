@@ -1,0 +1,50 @@
+generator clent {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+model hashtag {
+  id      Int      @id @default(autoincrement())
+  tagName String
+  isSelf  Boolean  @default(false)
+  vtubers vtuber[]
+  tweets  tweet[]
+}
+
+model vtuber {
+  id         Int      @id @default(autoincrement())
+  familyName String?
+  givenName  String
+  hashtag    hashtag? @relation(fields: [hashtagId], references: [id])
+  hashtagId  Int
+}
+
+model tweet {
+  id           Int      @id @default(autoincrement())
+  tweetDataId  String
+  text         String?
+  retweetCount Int
+  likeCount    Int
+  authorId     String
+  tweetUrl     String
+  tweetedAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  media        media[]
+  hashtag      hashtag? @relation(fields: [hashtagId], references: [id])
+  hashtagId    Int
+}
+
+model media {
+  id      Int    @id @default(autoincrement())
+  type    String
+  url     String
+  tweet   tweet? @relation(fields: [tweetId], references: [id])
+  tweetId Int
+}
