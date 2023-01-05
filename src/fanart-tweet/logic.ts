@@ -18,7 +18,7 @@ export class Logic {
 
   constructor() {
     this.logger = new Logger({ name: "insertFanartTweets" })
-    if (!process.env.PRODUCTION_FLG) {
+    if (process.env.PRODUCTION_ENV !== "prod") {
       dotenv.config()
     }
     const BEARER_TOKEN = process.env.BEARER_TOKEN ?? ""
