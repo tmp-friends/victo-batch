@@ -10,6 +10,8 @@ services:
     volumes:
       - ../..:/var/batch
       - batch_node_modules:/var/batch/node_modules
+    environment:
+      PRODUCTION_FLG: false
     networks:
       - victo_network
 

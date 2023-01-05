@@ -14,7 +14,9 @@ export class Logic {
   private roClient: TwitterApiReadOnly
 
   constructor() {
-    dotenv.config()
+    if (!process.env.PRODUCTION_FLG) {
+      dotenv.config()
+    }
     const BEARER_TOKEN = process.env.BEARER_TOKEN ?? ""
 
     this.prisma = new PrismaClient()
@@ -80,10 +82,10 @@ export class Logic {
 
     // ISO規格
     // getMonth()は0はじまりのため1加算する必要あり
-    const yesterdayMidnight = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate() - 1
-      }T00:00:00+09:00`
-    const todayMidnight = `${date.getFullYear()}-${date.getMonth() + 1
-      }-${date.getDate()}T00:00:00+09:00`
+    const yesterdayMidnight =
+      `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate() - 1}T00:00:00+09:00`
+    const todayMidnight =
+      `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}T00:00:00+09:00`
 
     return [yesterdayMidnight, todayMidnight]
   }
