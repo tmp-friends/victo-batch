@@ -47,8 +47,10 @@ export class Logic {
     } catch (e) {
       this.logger.fatal(e)
       this.logger.info("Failed")
+      process.exit(1)
     }
     this.logger.info("Success")
+    process.exit(0)
   }
 
   /**
