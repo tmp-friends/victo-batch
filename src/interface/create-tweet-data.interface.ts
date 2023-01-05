@@ -1,15 +1,10 @@
-import { CreateMediaData } from './create-media-data.interface';
-
 export class CreateTweetData {
-  hashtagId: number;
-  tweetDataId: string;
+  tweetId: string;
   text?: string;
   retweetCount: number;
   likeCount: number;
   authorId: string;
   tweetUrl: string;
   tweetedAt: Date;
-  media: {
-    create: CreateMediaData | null[];
-  };
+  hashtagId: number;
 }

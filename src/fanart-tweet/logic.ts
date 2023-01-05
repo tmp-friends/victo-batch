@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv"
+import { Logger } from "tslog"
 import {
   TwitterApi,
   TwitterApiReadOnly,
@@ -8,13 +9,18 @@ import { PrismaClient } from '@prisma/client'
 
 import { CreateTweetData } from '../interface/create-tweet-data.interface'
 import { CreateMediaData } from '../interface/create-media-data.interface'
+import { ILogObj } from "tslog/dist/types/interfaces"
 
 export class Logic {
+  private logger: Logger<ILogObj>
   private prisma: PrismaClient
   private roClient: TwitterApiReadOnly
 
   constructor() {
-    dotenv.config()
+    this.logger = new Logger({ name: "insertFanartTweets" })
+    if (!process.env.PRODUCTION_FLG) {
+      dotenv.config()
+    }
     const BEARER_TOKEN = process.env.BEARER_TOKEN ?? ""
 
     this.prisma = new PrismaClient()
@@ -26,18 +32,25 @@ export class Logic {
    * @remarks
    * ツイートを取得し、DBにインサートするバッチ処理
    */
-  public async doExecute(): Promise<string> {
+  public async doExecute() {
+    this.logger.info("Start")
     try {
-      const hashtagList = await this.prisma.hashtag.findMany()
+      const hashtagList = await this.prisma.hashtags.findMany()
 
       for await (const hashtag of hashtagList) {
+        this.logger.debug(`Hashtag: ${hashtag['tagName']}`)
         const fanartTweets = await this.fetchTweets(hashtag['tagName'])
+
         await this.insertTweets(hashtag['id'], fanartTweets)
+        await this.insertMedias(fanartTweets)
       }
     } catch (e) {
-      console.log(e)
+      this.logger.fatal(e)
+      this.logger.info("Failed")
+      process.exit(1)
     }
-    return "BATCH"
+    this.logger.info("Success")
+    process.exit(0)
   }
 
   /**
@@ -58,7 +71,7 @@ export class Logic {
       end_time: todayMidnight,
       expansions: ['author_id', 'attachments.media_keys'],
       'tweet.fields': ['created_at', 'public_metrics'],
-      'media.fields': ['preview_image_url', 'url'],
+      'media.fields': ['preview_image_url', 'url', 'variants'],
     })
 
     return fanartTweets
@@ -78,59 +91,71 @@ export class Logic {
 
     // ISO規格
     // getMonth()は0はじまりのため1加算する必要あり
-    const yesterdayMidnight = `${date.getFullYear()}-${date.getMonth() + 1}-${
-      date.getDate() - 1
-    }T00:00:00+09:00`
-    const todayMidnight = `${date.getFullYear()}-${
-      date.getMonth() + 1
-    }-${date.getDate()}T00:00:00+09:00`
+    const yesterdayMidnight =
+      `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate() - 1}T00:00:00+09:00`
+    const todayMidnight =
+      `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}T00:00:00+09:00`
 
     return [yesterdayMidnight, todayMidnight]
   }
 
   /**
    * @remarks
-   * ツイートをDBにインサートする処理
+   * tweetをDBにinsertする処理
    *
    * @param id - Hashtagの番号
    * @param fanartTweets - twitter-api-v2で取得したツイート配列
+   * @returns void
    */
   private async insertTweets(
     id: number,
     fanartTweets: TweetSearchRecentV2Paginator,
   ): Promise<void> {
+    const data: CreateTweetData[] = []
     for await (const fanartTweet of fanartTweets) {
       const [text, tweetUrl] = await this.extractTweetUrl(fanartTweet['text'])
 
-      const data: CreateTweetData = {
-        hashtagId: id,
-        tweetDataId: fanartTweet['id'],
-        text: 'a',
+      const tweetData: CreateTweetData = {
+        tweetId: fanartTweet['id'],
+        text: text,
         retweetCount: Number(fanartTweet['public_metrics']['retweet_count']),
         likeCount: Number(fanartTweet['public_metrics']['like_count']),
         authorId: fanartTweet['author_id'],
         tweetUrl: tweetUrl,
         tweetedAt: new Date(fanartTweet['created_at']),
-        media: {
-          create: [],
-        },
+        hashtagId: id,
       }
+      data.push(tweetData)
+    }
+    await this.prisma.tweets.createMany({ data, skipDuplicates: true })
+  }
 
-      // media.fieldsは追加情報のため別処理
+  /**
+   * @remarks
+   * mediaをDBにinsertする処理
+   *
+   * @param fanartTweets - twitter-api-v2で取得したツイート配列
+   * @returns void
+   */
+  private async insertMedias(
+    fanartTweets: TweetSearchRecentV2Paginator
+  ): Promise<void> {
+    const data: CreateMediaData[] = []
+    for await (const fanartTweet of fanartTweets) {
+      // media.fieldsは追加情報
       const mediaFields = fanartTweets.includes.medias(fanartTweet)
       // 画像は複数枚ある
-      const media = []
       for await (const mediaField of mediaFields) {
         const mediaData: CreateMediaData = {
           type: mediaField['type'],
-          url: mediaField['url'],
+          // 画像以外のmedia_typeも考慮
+          url: mediaField['url'] ?? mediaField['variants'][0]['url'],
+          tweetId: fanartTweet['id'],
         }
-        media.push(mediaData)
+        data.push(mediaData)
       }
-      data['media']['create'] = media
-
-      await this.prisma.tweet.create({ data })
     }
+    await this.prisma.medias.createMany({ data, skipDuplicates: true })
   }
 
   /**
