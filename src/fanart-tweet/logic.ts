@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv"
+import { Logger } from "tslog"
 import {
   TwitterApi,
   TwitterApiReadOnly,
@@ -8,12 +9,15 @@ import { PrismaClient } from '@prisma/client'
 
 import { CreateTweetData } from '../interface/create-tweet-data.interface'
 import { CreateMediaData } from '../interface/create-media-data.interface'
+import { ILogObj } from "tslog/dist/types/interfaces"
 
 export class Logic {
+  private logger: Logger<ILogObj>
   private prisma: PrismaClient
   private roClient: TwitterApiReadOnly
 
   constructor() {
+    this.logger = new Logger({ name: "insertFanartTweets" })
     if (!process.env.PRODUCTION_FLG) {
       dotenv.config()
     }
@@ -28,20 +32,23 @@ export class Logic {
    * @remarks
    * ツイートを取得し、DBにインサートするバッチ処理
    */
-  public async doExecute(): Promise<string> {
+  public async doExecute() {
+    this.logger.info("Start")
     try {
       const hashtagList = await this.prisma.hashtags.findMany()
 
       for await (const hashtag of hashtagList) {
+        this.logger.debug(`Hashtag: ${hashtag['tagName']}`)
         const fanartTweets = await this.fetchTweets(hashtag['tagName'])
 
         await this.insertTweets(hashtag['id'], fanartTweets)
         await this.insertMedias(fanartTweets)
       }
     } catch (e) {
-      console.log(e)
+      this.logger.fatal(e)
+      this.logger.info("Failed")
     }
-    return "BATCH"
+    this.logger.info("Success")
   }
 
   /**
