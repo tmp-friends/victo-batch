@@ -42,7 +42,7 @@ export class Logic {
         const fanartTweets = await this.fetchTweets(hashtag['tagName'])
 
         await this.insertTweets(hashtag['id'], fanartTweets)
-        await this.insertMedias(fanartTweets)
+        await this.insertMedia(fanartTweets)
       }
     } catch (e) {
       this.logger.fatal(e)
@@ -127,7 +127,7 @@ export class Logic {
       }
       data.push(tweetData)
     }
-    await this.prisma.tweets.createMany({ data, skipDuplicates: true })
+    await this.prisma.tweet_objects.createMany({ data, skipDuplicates: true })
   }
 
   /**
@@ -137,7 +137,7 @@ export class Logic {
    * @param fanartTweets - twitter-api-v2で取得したツイート配列
    * @returns void
    */
-  private async insertMedias(
+  private async insertMedia(
     fanartTweets: TweetSearchRecentV2Paginator
   ): Promise<void> {
     const data: CreateMediaData[] = []
@@ -155,7 +155,7 @@ export class Logic {
         data.push(mediaData)
       }
     }
-    await this.prisma.medias.createMany({ data, skipDuplicates: true })
+    await this.prisma.media_objects.createMany({ data, skipDuplicates: true })
   }
 
   /**

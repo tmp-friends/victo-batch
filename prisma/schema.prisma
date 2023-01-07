@@ -17,21 +17,31 @@ model hashtags {
   updatedAt DateTime @default(now())
 }
 
-model medias {
-  id        Int      @id @default(autoincrement())
-  type      String
-  url       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  tweetId   String
-}
-
 model schema_migrations {
   version BigInt  @id
   dirty   Boolean
 }
 
-model tweets {
+model vtubers {
+  id         Int      @id @default(autoincrement())
+  familyName String?
+  givenName  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  hashtagId  Int
+}
+
+model media_objects {
+  type      String
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  tweetId   String
+
+  @@id([tweetId, url])
+}
+
+model tweet_objects {
   tweetId      String   @id
   text         String?  @db.VarChar(4096)
   retweetCount Int
@@ -42,13 +52,4 @@ model tweets {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
   hashtagId    Int
-}
-
-model vtubers {
-  id         Int      @id @default(autoincrement())
-  familyName String?
-  givenName  String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now())
-  hashtagId  Int
 }
