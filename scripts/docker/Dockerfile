@@ -17,7 +17,7 @@ RUN chown -R $user:$user /var \
 
 WORKDIR /var/batch
 
-USER $user
-
 COPY package*.json ./
 RUN npm install
+
+USER $user
