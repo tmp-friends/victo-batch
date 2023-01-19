@@ -12,9 +12,7 @@ export class LogicFanartTweet {
     this.logger = new Logger({ name: "insertFanartTweets" })
 
     // 環境変数の読み込み
-    if (process.env.PRODUCTION_ENV !== "prod") {
-      dotenv.config()
-    }
+    dotenv.config()
 
     this.service = new ServiceFanartTweet()
   }
