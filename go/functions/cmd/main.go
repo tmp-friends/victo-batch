@@ -6,7 +6,7 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 	// Blank-import the function package so the init() runs
-	_ "github.com/tmp-friends/victo-batch/functions/register_hashtags"
+	_ "github.com/tmp-friends/victo-batch/functions"
 )
 
 func main() {
