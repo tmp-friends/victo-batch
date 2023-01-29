@@ -1,6 +1,8 @@
 package service
 
 import (
+	"encoding/json"
+	"os"
 	"strings"
 
 	"github.com/tmp-friends/victo-batch/functions/register_hashtags/lib"
@@ -17,7 +19,26 @@ func NewRegisterHashtagsService() *RegisterHashtagsService {
 	}
 }
 
-func (rhs *RegisterHashtagsService) FetchProfileImage() []string {
+type Vtuber struct {
+	Name          string `json:"name"`
+	BelongsTo     string `json:"belongs_to"`
+	TwitterUserId string `json:"twitter_user_id"`
+	Channel       string `json:"channel"`
+}
+
+func (rhs *RegisterHashtagsService) LoadJsonFile(filepath string) []Vtuber {
+	raw, err := os.ReadFile(filepath)
+	if err != nil {
+		panic(err)
+	}
+
+	vtubers := []Vtuber{}
+	json.Unmarshal(raw, &vtubers)
+
+	return vtubers
+}
+
+func (rhs *RegisterHashtagsService) FetchProfileImageUrls() []string {
 	res := rhs.lib.GetUsersBy()
 
 	profileImageUrls := []string{}
