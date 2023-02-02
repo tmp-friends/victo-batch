@@ -1,8 +1,6 @@
 package logic
 
 import (
-	"fmt"
-
 	"github.com/tmp-friends/victo-batch/functions/register_hashtags/service"
 )
 
@@ -22,11 +20,11 @@ func NewRegisterHashtagsLogic() *RegisterHashtagsLogic {
 func (rhl *RegisterHashtagsLogic) DoExecute() int {
 	// jsonファイルからvtuberの情報をload
 	vtubers := rhl.service.LoadJsonFile("./register_hashtags/assets/vtubers.json")
-	fmt.Println(vtubers)
 
 	// profile_image_url を取得
-	profileImageUrls := rhl.service.FetchProfileImageUrls()
-	fmt.Println(profileImageUrls)
+	pius := rhl.service.FetchProfileImageUrls(vtubers)
+	vtubers = rhl.service.AddProfileImageUrl(vtubers, pius)
+
 	// register vtubers
 
 	// register hashtags

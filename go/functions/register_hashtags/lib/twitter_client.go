@@ -21,11 +21,11 @@ func NewTwitterClient() *TwitterClient {
 	}
 }
 
-func (tc *TwitterClient) GetUsersBy() *gotwtr.UsersResponse {
+func (tc *TwitterClient) GetUsersBy(userNames []string) *gotwtr.UsersResponse {
 	// @see: https://pkg.go.dev/github.com/sivchari/gotwtr#Client.RetrieveMultipleUsersWithUserNames
 	res, err := tc.client.RetrieveMultipleUsersWithUserNames(
 		context.Background(),
-		[]string{"temple_circle"},
+		userNames,
 		&gotwtr.RetrieveUserOption{UserFields: []gotwtr.UserField{"profile_image_url"}},
 	)
 	if err != nil {
