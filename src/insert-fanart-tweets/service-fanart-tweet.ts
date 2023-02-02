@@ -92,16 +92,16 @@ export class ServiceFanartTweet {
       const [text, tweetUrl] = await this.extractTweetUrl(fanartTweet['text'])
 
       const tweetData: tweet_objects = {
-        tweetId: fanartTweet['id'],
+        tweet_id: fanartTweet['id'],
         text: text,
-        retweetCount: Number(fanartTweet['public_metrics']['retweet_count']),
-        likeCount: Number(fanartTweet['public_metrics']['like_count']),
-        authorId: fanartTweet['author_id'],
-        tweetUrl: tweetUrl,
-        tweetedAt: new Date(fanartTweet['created_at']),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        hashtagId: id,
+        retweet_count: Number(fanartTweet['public_metrics']['retweet_count']),
+        like_count: Number(fanartTweet['public_metrics']['like_count']),
+        author_id: fanartTweet['author_id'],
+        tweet_url: tweetUrl,
+        tweeted_at: new Date(fanartTweet['created_at']),
+        created_at: new Date(),
+        updated_at: new Date(),
+        hashtag_id: id,
       }
       data.push(tweetData)
     }
@@ -144,9 +144,9 @@ export class ServiceFanartTweet {
           type: mediaField['type'],
           // 画像以外のmedia_typeも考慮
           url: mediaField['url'] ?? mediaField['variants'][0]['url'],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          tweetId: fanartTweet['id'],
+          created_at: new Date(),
+          updated_at: new Date(),
+          tweet_id: fanartTweet['id'],
         }
         data.push(mediaData)
       }

@@ -28,8 +28,8 @@ export class LogicFanartTweet {
       const hashtagList = await this.service.getHashtags()
 
       for await (const hashtag of hashtagList) {
-        const fanartTweets = await this.service.fetchTweets(hashtag['tagName'])
-        this.logger.debug(`${hashtag["tagName"]}: ${fanartTweets.tweets.length}`)
+        const fanartTweets = await this.service.fetchTweets(hashtag['name'])
+        this.logger.debug(`${hashtag["name"]}: ${fanartTweets.tweets.length}`)
 
         await this.service.insertTweets(hashtag['id'], fanartTweets)
         await this.service.insertMedia(fanartTweets)
