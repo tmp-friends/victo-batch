@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/sivchari/gotwtr"
+	"github.com/tmp-friends/victo-batch/functions/dto"
+	"github.com/tmp-friends/victo-batch/functions/register_hashtags/dao"
 	"github.com/tmp-friends/victo-batch/functions/register_hashtags/lib"
 )
 
@@ -13,6 +15,7 @@ const REQ_LIMIT = 100
 
 type RegisterHashtagsService struct {
 	lib *lib.TwitterClient
+	dao *dao.RegisterHashtagsDao
 }
 
 func NewRegisterHashtagsService() *RegisterHashtagsService {
@@ -22,28 +25,19 @@ func NewRegisterHashtagsService() *RegisterHashtagsService {
 	}
 }
 
-type Vtuber struct {
-	Name            string `json:"name"`
-	BelongsTo       string `json:"belongs_to"`
-	ProfileImageURL string `json:"profile_image_url"`
-	TwitterUserName string `json:"twitter_user_name"`
-	Channel         string `json:"channel"`
-	HashtagName     string `json:"hashtag_name"`
-}
-
-func (rhs *RegisterHashtagsService) LoadJsonFile(filepath string) []Vtuber {
+func (rhs *RegisterHashtagsService) LoadJsonFile(filepath string) []dto.Vtuber {
 	raw, err := os.ReadFile(filepath)
 	if err != nil {
 		panic(err)
 	}
 
-	vtubers := []Vtuber{}
+	vtubers := []dto.Vtuber{}
 	json.Unmarshal(raw, &vtubers)
 
 	return vtubers
 }
 
-func (rhs *RegisterHashtagsService) FetchProfileImageUrls(vtubers []Vtuber) []string {
+func (rhs *RegisterHashtagsService) FetchProfileImageUrls(vtubers []dto.Vtuber) []string {
 	userNames := rhs.extractTwitterUserNames(vtubers)
 
 	usersRes := rhs.requestAPI(userNames)
@@ -58,10 +52,11 @@ func (rhs *RegisterHashtagsService) FetchProfileImageUrls(vtubers []Vtuber) []st
 			profileImageUrls = append(profileImageUrls, piu)
 		}
 	}
+
 	return profileImageUrls
 }
 
-func (rhs *RegisterHashtagsService) extractTwitterUserNames(vtubers []Vtuber) []string {
+func (rhs *RegisterHashtagsService) extractTwitterUserNames(vtubers []dto.Vtuber) []string {
 	userNames := []string{}
 	for _, v := range vtubers {
 		un := v.TwitterUserName
@@ -98,9 +93,9 @@ func (rhs *RegisterHashtagsService) requestAPI(userNames []string) []*gotwtr.Use
 }
 
 func (rhs *RegisterHashtagsService) AddProfileImageUrl(
-	vtubers []Vtuber,
+	vtubers []dto.Vtuber,
 	profileImageUrls []string,
-) []Vtuber {
+) []dto.Vtuber {
 	emptyIdx := 0
 	for i, url := range profileImageUrls {
 		if vtubers[i].TwitterUserName == "" {
