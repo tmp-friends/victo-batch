@@ -10,10 +10,11 @@ import (
 )
 
 type Vtuber struct {
-	Name          string `json:"name"`
-	BelongsTo     string `json:"belongs_to"`
-	TwitterUserId string `json:"twitter_user_id"`
-	Channel       string `json:"channel"`
+	Name            string `json:"name"`
+	BelongsTo       string `json:"belongs_to"`
+	TwitterUserName string `json:"twitter_user_name"`
+	Channel         string `json:"channel"`
+	HashtagName     string `json:"hashtag_name"`
 }
 
 func main() {
@@ -60,32 +61,34 @@ func getVtuberInfo(vtuberNames []string) {
 		doc := requestHTML("https://wikiwiki.jp/nijisanji/" + name)
 		hrefList := findHref(doc)
 
+		hashtagName := findHashtagName(name, doc)
+
 		// 構造体に追加
 		vtuber := Vtuber{
-			Name:          name,
-			BelongsTo:     "にじさんじ",
-			TwitterUserId: hrefList[0],
-			Channel:       hrefList[1],
+			Name:            name,
+			BelongsTo:       "にじさんじ",
+			TwitterUserName: hrefList[0],
+			Channel:         hrefList[1],
+			HashtagName:     hashtagName,
 		}
 		vtubers = append(vtubers, vtuber)
 
-		displayHashtagName(name, doc)
 	}
 
 	writeJsonFile(vtubers)
 }
 
 func findHref(doc *goquery.Document) []string {
-	twitterUId := ""
+	twitterUName := ""
 	channel := ""
 	doc.Find("#content .h-scrollable table .ext").EachWithBreak(func(_ int, s *goquery.Selection) bool {
 		href, _ := s.Attr("href")
 
-		// Twitter UserId
-		// 最初に現れるTwitterのリンクがTwitterUId
-		if twitterUId == "" {
+		// TwitterUserName
+		// 最初に現れるTwitterのリンクがtwitter_user_name
+		if twitterUName == "" {
 			if strings.Contains(href, "twitter.com") {
-				twitterUId = href
+				twitterUName = href
 			}
 		}
 
@@ -100,23 +103,26 @@ func findHref(doc *goquery.Document) []string {
 		return true
 	})
 
-	return []string{twitterUId, channel}
+	return []string{twitterUName, channel}
 }
 
-func displayHashtagName(vtuberName string, doc *goquery.Document) {
+func findHashtagName(vtuberName string, doc *goquery.Document) string {
 	keyword := "ファンアート：#"
 
+	hashtagName := ""
 	doc.Find("#content .h-scrollable table").Each(func(_ int, s *goquery.Selection) {
 		text := s.Text()
 		idx := strings.Index(text, keyword) + len(keyword)
 		if idx > len(keyword) {
-			hashtagName := text[idx : idx+80]
-			fmt.Printf("%s\n\"hashtag_name\": \"%s\n\n", vtuberName, hashtagName)
+			hashtagName = text[idx : idx+80]
+			fmt.Printf("%s\n%s\n\n", vtuberName, hashtagName)
 		}
 	})
+
+	return hashtagName
 }
 
 func writeJsonFile(vtubers []Vtuber) {
 	file, _ := json.MarshalIndent(vtubers, "", "  ")
-	_ = os.WriteFile("/var/batch/outputs/vtubers.json", file, 0755)
+	_ = os.WriteFile("/var/batch/scripts/scraping/outputs/vtubers.json", file, 0755)
 }

@@ -1,4 +1,4 @@
-module github.com/tmp-friends/victo-batch
+module scraping
 
 go 1.19
 

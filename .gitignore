@@ -2,3 +2,5 @@ node_modules/
 dist/
 .env
 .env.yaml
+go/functions/sqlboiler.toml
+go/scripts/scraping/outputs/vtubers.json
