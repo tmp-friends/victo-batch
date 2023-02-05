@@ -2,9 +2,9 @@ package lib
 
 import (
 	"context"
+	"os"
 
 	"github.com/sivchari/gotwtr"
-	"github.com/tmp-friends/victo-batch/functions/config"
 )
 
 type TwitterClient struct {
@@ -12,9 +12,7 @@ type TwitterClient struct {
 }
 
 func NewTwitterClient() *TwitterClient {
-	env := config.LoadEnv()
-
-	client := gotwtr.New(env["BEARER_TOKEN"])
+	client := gotwtr.New(os.Getenv("BEARER_TOKEN"))
 
 	return &TwitterClient{
 		client: client,

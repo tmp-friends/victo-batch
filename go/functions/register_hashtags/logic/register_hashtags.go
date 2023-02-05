@@ -1,6 +1,8 @@
 package logic
 
 import (
+	"os"
+
 	"github.com/tmp-friends/victo-batch/functions/register_hashtags/service"
 )
 
@@ -17,15 +19,14 @@ func NewRegisterHashtagsLogic() *RegisterHashtagsLogic {
 }
 
 // Schedulerには登録せず手動実行させるバッチ
-func (rhl *RegisterHashtagsLogic) DoExecute() int {
+func (rhl *RegisterHashtagsLogic) DoExecute() {
 	// jsonファイルからvtuberの情報をload
-	vtubers := rhl.service.LoadJsonFile("./assets/vtubers.json")
+	vtubers := rhl.service.LoadJsonFile(os.Getenv("SOURCE_DIR") + "assets/vtubers.json")
 
 	// profile_image_url を取得
 	pius := rhl.service.FetchProfileImageUrls(vtubers)
 	vtubers = rhl.service.AddProfileImageUrl(vtubers, pius)
 
+	// INSERT実行
 	rhl.service.RegisterVtubers(vtubers)
-
-	return 0
 }

@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"strings"
 
@@ -103,7 +102,6 @@ func (rhs *RegisterHashtagsService) AddProfileImageUrl(
 ) []*dto.Vtuber {
 	var emptyIdx int
 	for i, v := range vtubers {
-		fmt.Print(v)
 		if v.TwitterUserName == "" {
 			emptyIdx++
 			continue
