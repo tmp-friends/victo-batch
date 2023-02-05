@@ -19,7 +19,7 @@ func NewRegisterHashtagsLogic() *RegisterHashtagsLogic {
 // Schedulerには登録せず手動実行させるバッチ
 func (rhl *RegisterHashtagsLogic) DoExecute() int {
 	// jsonファイルからvtuberの情報をload
-	vtubers := rhl.service.LoadJsonFile("./register_hashtags/assets/vtubers.json")
+	vtubers := rhl.service.LoadJsonFile("./assets/vtubers.json")
 
 	// profile_image_url を取得
 	pius := rhl.service.FetchProfileImageUrls(vtubers)
