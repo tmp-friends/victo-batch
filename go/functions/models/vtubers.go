@@ -24,86 +24,79 @@ import (
 
 // Vtuber is an object representing the database table.
 type Vtuber struct {
-	ID            int         `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name          string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	BelongsTo     null.String `boil:"belongs_to" json:"belongs_to,omitempty" toml:"belongs_to" yaml:"belongs_to,omitempty"`
-	ProfileImage  string      `boil:"profile_image" json:"profile_image" toml:"profile_image" yaml:"profile_image"`
-	TwitterUserID string      `boil:"twitter_user_id" json:"twitter_user_id" toml:"twitter_user_id" yaml:"twitter_user_id"`
-	Channel       string      `boil:"channel" json:"channel" toml:"channel" yaml:"channel"`
-	CreatedAt     time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt     time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	HashtagID     string      `boil:"hashtag_id" json:"hashtag_id" toml:"hashtag_id" yaml:"hashtag_id"`
+	ID              int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name            string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	BelongsTo       null.String `boil:"belongs_to" json:"belongs_to,omitempty" toml:"belongs_to" yaml:"belongs_to,omitempty"`
+	ProfileImageURL null.String `boil:"profile_image_url" json:"profile_image_url,omitempty" toml:"profile_image_url" yaml:"profile_image_url,omitempty"`
+	TwitterUserName null.String `boil:"twitter_user_name" json:"twitter_user_name,omitempty" toml:"twitter_user_name" yaml:"twitter_user_name,omitempty"`
+	Channel         null.String `boil:"channel" json:"channel,omitempty" toml:"channel" yaml:"channel,omitempty"`
+	CreatedAt       time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt       time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *vtuberR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L vtuberL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var VtuberColumns = struct {
-	ID            string
-	Name          string
-	BelongsTo     string
-	ProfileImage  string
-	TwitterUserID string
-	Channel       string
-	CreatedAt     string
-	UpdatedAt     string
-	HashtagID     string
+	ID              string
+	Name            string
+	BelongsTo       string
+	ProfileImageURL string
+	TwitterUserName string
+	Channel         string
+	CreatedAt       string
+	UpdatedAt       string
 }{
-	ID:            "id",
-	Name:          "name",
-	BelongsTo:     "belongs_to",
-	ProfileImage:  "profile_image",
-	TwitterUserID: "twitter_user_id",
-	Channel:       "channel",
-	CreatedAt:     "created_at",
-	UpdatedAt:     "updated_at",
-	HashtagID:     "hashtag_id",
+	ID:              "id",
+	Name:            "name",
+	BelongsTo:       "belongs_to",
+	ProfileImageURL: "profile_image_url",
+	TwitterUserName: "twitter_user_name",
+	Channel:         "channel",
+	CreatedAt:       "created_at",
+	UpdatedAt:       "updated_at",
 }
 
 var VtuberTableColumns = struct {
-	ID            string
-	Name          string
-	BelongsTo     string
-	ProfileImage  string
-	TwitterUserID string
-	Channel       string
-	CreatedAt     string
-	UpdatedAt     string
-	HashtagID     string
+	ID              string
+	Name            string
+	BelongsTo       string
+	ProfileImageURL string
+	TwitterUserName string
+	Channel         string
+	CreatedAt       string
+	UpdatedAt       string
 }{
-	ID:            "vtubers.id",
-	Name:          "vtubers.name",
-	BelongsTo:     "vtubers.belongs_to",
-	ProfileImage:  "vtubers.profile_image",
-	TwitterUserID: "vtubers.twitter_user_id",
-	Channel:       "vtubers.channel",
-	CreatedAt:     "vtubers.created_at",
-	UpdatedAt:     "vtubers.updated_at",
-	HashtagID:     "vtubers.hashtag_id",
+	ID:              "vtubers.id",
+	Name:            "vtubers.name",
+	BelongsTo:       "vtubers.belongs_to",
+	ProfileImageURL: "vtubers.profile_image_url",
+	TwitterUserName: "vtubers.twitter_user_name",
+	Channel:         "vtubers.channel",
+	CreatedAt:       "vtubers.created_at",
+	UpdatedAt:       "vtubers.updated_at",
 }
 
 // Generated where
 
 var VtuberWhere = struct {
-	ID            whereHelperint
-	Name          whereHelperstring
-	BelongsTo     whereHelpernull_String
-	ProfileImage  whereHelperstring
-	TwitterUserID whereHelperstring
-	Channel       whereHelperstring
-	CreatedAt     whereHelpertime_Time
-	UpdatedAt     whereHelpertime_Time
-	HashtagID     whereHelperstring
+	ID              whereHelperint
+	Name            whereHelperstring
+	BelongsTo       whereHelpernull_String
+	ProfileImageURL whereHelpernull_String
+	TwitterUserName whereHelpernull_String
+	Channel         whereHelpernull_String
+	CreatedAt       whereHelpertime_Time
+	UpdatedAt       whereHelpertime_Time
 }{
-	ID:            whereHelperint{field: "`vtubers`.`id`"},
-	Name:          whereHelperstring{field: "`vtubers`.`name`"},
-	BelongsTo:     whereHelpernull_String{field: "`vtubers`.`belongs_to`"},
-	ProfileImage:  whereHelperstring{field: "`vtubers`.`profile_image`"},
-	TwitterUserID: whereHelperstring{field: "`vtubers`.`twitter_user_id`"},
-	Channel:       whereHelperstring{field: "`vtubers`.`channel`"},
-	CreatedAt:     whereHelpertime_Time{field: "`vtubers`.`created_at`"},
-	UpdatedAt:     whereHelpertime_Time{field: "`vtubers`.`updated_at`"},
-	HashtagID:     whereHelperstring{field: "`vtubers`.`hashtag_id`"},
+	ID:              whereHelperint{field: "`vtubers`.`id`"},
+	Name:            whereHelperstring{field: "`vtubers`.`name`"},
+	BelongsTo:       whereHelpernull_String{field: "`vtubers`.`belongs_to`"},
+	ProfileImageURL: whereHelpernull_String{field: "`vtubers`.`profile_image_url`"},
+	TwitterUserName: whereHelpernull_String{field: "`vtubers`.`twitter_user_name`"},
+	Channel:         whereHelpernull_String{field: "`vtubers`.`channel`"},
+	CreatedAt:       whereHelpertime_Time{field: "`vtubers`.`created_at`"},
+	UpdatedAt:       whereHelpertime_Time{field: "`vtubers`.`updated_at`"},
 }
 
 // VtuberRels is where relationship names are stored.
@@ -123,8 +116,8 @@ func (*vtuberR) NewStruct() *vtuberR {
 type vtuberL struct{}
 
 var (
-	vtuberAllColumns            = []string{"id", "name", "belongs_to", "profile_image", "twitter_user_id", "channel", "created_at", "updated_at", "hashtag_id"}
-	vtuberColumnsWithoutDefault = []string{"name", "belongs_to", "profile_image", "twitter_user_id", "channel", "hashtag_id"}
+	vtuberAllColumns            = []string{"id", "name", "belongs_to", "profile_image_url", "twitter_user_name", "channel", "created_at", "updated_at"}
+	vtuberColumnsWithoutDefault = []string{"name", "belongs_to", "profile_image_url", "twitter_user_name", "channel"}
 	vtuberColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	vtuberPrimaryKeyColumns     = []string{"id"}
 	vtuberGeneratedColumns      = []string{}

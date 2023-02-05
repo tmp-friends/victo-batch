@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 
@@ -20,24 +21,27 @@ type RegisterHashtagsService struct {
 
 func NewRegisterHashtagsService() *RegisterHashtagsService {
 	tc := lib.NewTwitterClient()
+	dao := dao.NewRegisterHashtagsDao()
+
 	return &RegisterHashtagsService{
 		lib: tc,
+		dao: dao,
 	}
 }
 
-func (rhs *RegisterHashtagsService) LoadJsonFile(filepath string) []dto.Vtuber {
+func (rhs *RegisterHashtagsService) LoadJsonFile(filepath string) []*dto.Vtuber {
 	raw, err := os.ReadFile(filepath)
 	if err != nil {
 		panic(err)
 	}
 
-	vtubers := []dto.Vtuber{}
+	vtubers := []*dto.Vtuber{}
 	json.Unmarshal(raw, &vtubers)
 
 	return vtubers
 }
 
-func (rhs *RegisterHashtagsService) FetchProfileImageUrls(vtubers []dto.Vtuber) []string {
+func (rhs *RegisterHashtagsService) FetchProfileImageUrls(vtubers []*dto.Vtuber) []string {
 	userNames := rhs.extractTwitterUserNames(vtubers)
 
 	usersRes := rhs.requestAPI(userNames)
@@ -56,7 +60,7 @@ func (rhs *RegisterHashtagsService) FetchProfileImageUrls(vtubers []dto.Vtuber) 
 	return profileImageUrls
 }
 
-func (rhs *RegisterHashtagsService) extractTwitterUserNames(vtubers []dto.Vtuber) []string {
+func (rhs *RegisterHashtagsService) extractTwitterUserNames(vtubers []*dto.Vtuber) []string {
 	userNames := []string{}
 	for _, v := range vtubers {
 		un := v.TwitterUserName
@@ -92,17 +96,28 @@ func (rhs *RegisterHashtagsService) requestAPI(userNames []string) []*gotwtr.Use
 	return usersRes
 }
 
+// 引数のvtubersを更新する必要があるため参照渡し
 func (rhs *RegisterHashtagsService) AddProfileImageUrl(
-	vtubers []dto.Vtuber,
+	vtubers []*dto.Vtuber,
 	profileImageUrls []string,
-) []dto.Vtuber {
-	emptyIdx := 0
-	for i, url := range profileImageUrls {
-		if vtubers[i].TwitterUserName == "" {
+) []*dto.Vtuber {
+	var emptyIdx int
+	for i, v := range vtubers {
+		fmt.Print(v)
+		if v.TwitterUserName == "" {
 			emptyIdx++
+			continue
 		}
-		vtubers[i+emptyIdx].ProfileImageURL = url
+
+		if (i - emptyIdx) > len(profileImageUrls) {
+			break
+		}
+		v.ProfileImageURL = profileImageUrls[i-emptyIdx]
 	}
 
 	return vtubers
+}
+
+func (rhs *RegisterHashtagsService) RegisterVtubers(vtubers []*dto.Vtuber) {
+	rhs.dao.RegisterVtubers(vtubers)
 }

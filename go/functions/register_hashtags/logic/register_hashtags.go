@@ -25,9 +25,7 @@ func (rhl *RegisterHashtagsLogic) DoExecute() int {
 	pius := rhl.service.FetchProfileImageUrls(vtubers)
 	vtubers = rhl.service.AddProfileImageUrl(vtubers, pius)
 
-	// register vtubers
-
-	// register hashtags
+	rhl.service.RegisterVtubers(vtubers)
 
 	return 0
 }

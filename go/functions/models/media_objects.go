@@ -23,8 +23,8 @@ import (
 
 // MediaObject is an object representing the database table.
 type MediaObject struct {
-	Type      string    `boil:"type" json:"type" toml:"type" yaml:"type"`
 	URL       string    `boil:"url" json:"url" toml:"url" yaml:"url"`
+	Type      string    `boil:"type" json:"type" toml:"type" yaml:"type"`
 	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt time.Time `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 	TweetID   string    `boil:"tweet_id" json:"tweet_id" toml:"tweet_id" yaml:"tweet_id"`
@@ -34,28 +34,28 @@ type MediaObject struct {
 }
 
 var MediaObjectColumns = struct {
-	Type      string
 	URL       string
+	Type      string
 	CreatedAt string
 	UpdatedAt string
 	TweetID   string
 }{
-	Type:      "type",
 	URL:       "url",
+	Type:      "type",
 	CreatedAt: "created_at",
 	UpdatedAt: "updated_at",
 	TweetID:   "tweet_id",
 }
 
 var MediaObjectTableColumns = struct {
-	Type      string
 	URL       string
+	Type      string
 	CreatedAt string
 	UpdatedAt string
 	TweetID   string
 }{
-	Type:      "media_objects.type",
 	URL:       "media_objects.url",
+	Type:      "media_objects.type",
 	CreatedAt: "media_objects.created_at",
 	UpdatedAt: "media_objects.updated_at",
 	TweetID:   "media_objects.tweet_id",
@@ -64,14 +64,14 @@ var MediaObjectTableColumns = struct {
 // Generated where
 
 var MediaObjectWhere = struct {
-	Type      whereHelperstring
 	URL       whereHelperstring
+	Type      whereHelperstring
 	CreatedAt whereHelpertime_Time
 	UpdatedAt whereHelpertime_Time
 	TweetID   whereHelperstring
 }{
-	Type:      whereHelperstring{field: "`media_objects`.`type`"},
 	URL:       whereHelperstring{field: "`media_objects`.`url`"},
+	Type:      whereHelperstring{field: "`media_objects`.`type`"},
 	CreatedAt: whereHelpertime_Time{field: "`media_objects`.`created_at`"},
 	UpdatedAt: whereHelpertime_Time{field: "`media_objects`.`updated_at`"},
 	TweetID:   whereHelperstring{field: "`media_objects`.`tweet_id`"},
@@ -94,8 +94,8 @@ func (*mediaObjectR) NewStruct() *mediaObjectR {
 type mediaObjectL struct{}
 
 var (
-	mediaObjectAllColumns            = []string{"type", "url", "created_at", "updated_at", "tweet_id"}
-	mediaObjectColumnsWithoutDefault = []string{"type", "url", "tweet_id"}
+	mediaObjectAllColumns            = []string{"url", "type", "created_at", "updated_at", "tweet_id"}
+	mediaObjectColumnsWithoutDefault = []string{"url", "type", "tweet_id"}
 	mediaObjectColumnsWithDefault    = []string{"created_at", "updated_at"}
 	mediaObjectPrimaryKeyColumns     = []string{"tweet_id", "url"}
 	mediaObjectGeneratedColumns      = []string{}

@@ -6,5 +6,4 @@ type Vtuber struct {
 	ProfileImageURL string `json:"profile_image_url"`
 	TwitterUserName string `json:"twitter_user_name"`
 	Channel         string `json:"channel"`
-	HashtagName     string `json:"hashtag_name"`
 }
