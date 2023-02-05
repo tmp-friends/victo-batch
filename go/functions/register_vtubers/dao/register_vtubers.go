@@ -11,19 +11,19 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
-type RegisterHashtagsDao struct {
+type RegisterVtubersDao struct {
 	DB *sql.DB
 }
 
-func NewRegisterHashtagsDao() *RegisterHashtagsDao {
+func NewRegisterVtubersDao() *RegisterVtubersDao {
 	db := config.NewMySQLConnector()
 
-	return &RegisterHashtagsDao{
+	return &RegisterVtubersDao{
 		DB: db.Conn,
 	}
 }
 
-func (rhd *RegisterHashtagsDao) RegisterVtubers(vtubers []*dto.Vtuber) {
+func (rvd *RegisterVtubersDao) RegisterVtubers(vtubers []*dto.Vtuber) {
 	for _, v := range vtubers {
 		vtuber := models.Vtuber{
 			Name:            v.Name,
@@ -33,6 +33,6 @@ func (rhd *RegisterHashtagsDao) RegisterVtubers(vtubers []*dto.Vtuber) {
 			Channel:         null.StringFrom(v.Channel),
 		}
 
-		vtuber.Insert(context.Background(), rhd.DB, boil.Infer())
+		vtuber.Insert(context.Background(), rvd.DB, boil.Infer())
 	}
 }

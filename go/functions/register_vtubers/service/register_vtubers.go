@@ -7,28 +7,28 @@ import (
 
 	"github.com/sivchari/gotwtr"
 	"github.com/tmp-friends/victo-batch/functions/dto"
-	"github.com/tmp-friends/victo-batch/functions/register_hashtags/dao"
-	"github.com/tmp-friends/victo-batch/functions/register_hashtags/lib"
+	"github.com/tmp-friends/victo-batch/functions/register_vtubers/dao"
+	"github.com/tmp-friends/victo-batch/functions/register_vtubers/lib"
 )
 
 const REQ_LIMIT = 100
 
-type RegisterHashtagsService struct {
+type RegisterVtubersService struct {
 	lib *lib.TwitterClient
-	dao *dao.RegisterHashtagsDao
+	dao *dao.RegisterVtubersDao
 }
 
-func NewRegisterHashtagsService() *RegisterHashtagsService {
+func NewRegisterVtubersService() *RegisterVtubersService {
 	tc := lib.NewTwitterClient()
-	dao := dao.NewRegisterHashtagsDao()
+	dao := dao.NewRegisterVtubersDao()
 
-	return &RegisterHashtagsService{
+	return &RegisterVtubersService{
 		lib: tc,
 		dao: dao,
 	}
 }
 
-func (rhs *RegisterHashtagsService) LoadJsonFile(filepath string) []*dto.Vtuber {
+func (rvs *RegisterVtubersService) LoadJsonFile(filepath string) []*dto.Vtuber {
 	raw, err := os.ReadFile(filepath)
 	if err != nil {
 		panic(err)
@@ -40,10 +40,10 @@ func (rhs *RegisterHashtagsService) LoadJsonFile(filepath string) []*dto.Vtuber 
 	return vtubers
 }
 
-func (rhs *RegisterHashtagsService) FetchProfileImageUrls(vtubers []*dto.Vtuber) []string {
-	userNames := rhs.extractTwitterUserNames(vtubers)
+func (rvs *RegisterVtubersService) FetchProfileImageUrls(vtubers []*dto.Vtuber) []string {
+	userNames := rvs.extractTwitterUserNames(vtubers)
 
-	usersRes := rhs.requestAPI(userNames)
+	usersRes := rvs.requestAPI(userNames)
 
 	profileImageUrls := []string{}
 	for i := 0; i < len(usersRes); i++ {
@@ -59,7 +59,7 @@ func (rhs *RegisterHashtagsService) FetchProfileImageUrls(vtubers []*dto.Vtuber)
 	return profileImageUrls
 }
 
-func (rhs *RegisterHashtagsService) extractTwitterUserNames(vtubers []*dto.Vtuber) []string {
+func (rvs *RegisterVtubersService) extractTwitterUserNames(vtubers []*dto.Vtuber) []string {
 	userNames := []string{}
 	for _, v := range vtubers {
 		un := v.TwitterUserName
@@ -77,7 +77,7 @@ func (rhs *RegisterHashtagsService) extractTwitterUserNames(vtubers []*dto.Vtube
 	return userNames
 }
 
-func (rhs *RegisterHashtagsService) requestAPI(userNames []string) []*gotwtr.UsersResponse {
+func (rvs *RegisterVtubersService) requestAPI(userNames []string) []*gotwtr.UsersResponse {
 	// 小数点以下切り捨ての除算
 	process := len(userNames) / REQ_LIMIT
 
@@ -88,7 +88,7 @@ func (rhs *RegisterHashtagsService) requestAPI(userNames []string) []*gotwtr.Use
 			requns = userNames[i*REQ_LIMIT:]
 		}
 
-		res := rhs.lib.GetUsersBy(requns)
+		res := rvs.lib.GetUsersBy(requns)
 		usersRes = append(usersRes, res)
 	}
 
@@ -96,7 +96,7 @@ func (rhs *RegisterHashtagsService) requestAPI(userNames []string) []*gotwtr.Use
 }
 
 // 引数のvtubersを更新する必要があるため参照渡し
-func (rhs *RegisterHashtagsService) AddProfileImageUrl(
+func (rvs *RegisterVtubersService) AddProfileImageUrl(
 	vtubers []*dto.Vtuber,
 	profileImageUrls []string,
 ) []*dto.Vtuber {
@@ -116,6 +116,6 @@ func (rhs *RegisterHashtagsService) AddProfileImageUrl(
 	return vtubers
 }
 
-func (rhs *RegisterHashtagsService) RegisterVtubers(vtubers []*dto.Vtuber) {
-	rhs.dao.RegisterVtubers(vtubers)
+func (rvs *RegisterVtubersService) RegisterVtubers(vtubers []*dto.Vtuber) {
+	rvs.dao.RegisterVtubers(vtubers)
 }
