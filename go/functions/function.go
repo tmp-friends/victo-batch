@@ -8,7 +8,8 @@ import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/joho/godotenv"
 
-	"github.com/tmp-friends/victo-batch/functions/register_vtubers/logic"
+	hashtagLogic "github.com/tmp-friends/victo-batch/functions/register_hashtags/logic"
+	vtuberLogic "github.com/tmp-friends/victo-batch/functions/register_vtubers/logic"
 )
 
 // Targetの定義
@@ -16,6 +17,7 @@ func init() {
 	loadEnv()
 
 	functions.HTTP("RegisterVtubers", registerVtubers)
+	functions.HTTP("RegisterHashtags", registerHashtags)
 }
 
 func loadEnv() {
@@ -28,6 +30,11 @@ func loadEnv() {
 }
 
 func registerVtubers(w http.ResponseWriter, r *http.Request) {
-	rvl := logic.NewRegisterVtubersLogic()
+	rvl := vtuberLogic.NewRegisterVtubersLogic()
 	rvl.DoExecute()
+}
+
+func registerHashtags(w http.ResponseWriter, r *http.Request) {
+	rhl := hashtagLogic.NewRegisterHashtagsLogic()
+	rhl.DoExecute()
 }

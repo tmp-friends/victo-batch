@@ -29,5 +29,4 @@ func (rvl *RegisterVtubersLogic) DoExecute() {
 
 	// INSERT実行
 	rvl.service.RegisterVtubers(vtubers)
-	rvl.service.RegisterVtubers(vtubers)
 }

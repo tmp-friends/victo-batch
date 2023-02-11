@@ -178,8 +178,8 @@ type hashtagL struct{}
 
 var (
 	hashtagAllColumns            = []string{"id", "name", "is_self", "created_at", "updated_at", "vtuber_id"}
-	hashtagColumnsWithoutDefault = []string{"name", "vtuber_id"}
-	hashtagColumnsWithDefault    = []string{"id", "is_self", "created_at", "updated_at"}
+	hashtagColumnsWithoutDefault = []string{"id", "name", "vtuber_id"}
+	hashtagColumnsWithDefault    = []string{"is_self", "created_at", "updated_at"}
 	hashtagPrimaryKeyColumns     = []string{"id"}
 	hashtagGeneratedColumns      = []string{}
 )
@@ -602,26 +602,15 @@ func (o *Hashtag) Insert(ctx context.Context, exec boil.ContextExecutor, columns
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	result, err := exec.ExecContext(ctx, cache.query, vals...)
+	_, err = exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to insert into hashtags")
 	}
 
-	var lastID int64
 	var identifierCols []interface{}
 
 	if len(cache.retMapping) == 0 {
-		goto CacheNoHooks
-	}
-
-	lastID, err = result.LastInsertId()
-	if err != nil {
-		return ErrSyncFail
-	}
-
-	o.ID = int(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == hashtagMapping["id"] {
 		goto CacheNoHooks
 	}
 
@@ -911,27 +900,16 @@ func (o *Hashtag) Upsert(ctx context.Context, exec boil.ContextExecutor, updateC
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	result, err := exec.ExecContext(ctx, cache.query, vals...)
+	_, err = exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to upsert for hashtags")
 	}
 
-	var lastID int64
 	var uniqueMap []uint64
 	var nzUniqueCols []interface{}
 
 	if len(cache.retMapping) == 0 {
-		goto CacheNoHooks
-	}
-
-	lastID, err = result.LastInsertId()
-	if err != nil {
-		return ErrSyncFail
-	}
-
-	o.ID = int(lastID)
-	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == hashtagMapping["id"] {
 		goto CacheNoHooks
 	}
 
