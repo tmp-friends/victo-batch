@@ -8,6 +8,7 @@ import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/joho/godotenv"
 
+	fanartTweetsLogic "github.com/tmp-friends/victo-batch/functions/insert_fanart_tweets/logic"
 	hashtagLogic "github.com/tmp-friends/victo-batch/functions/register_hashtags/logic"
 	vtuberLogic "github.com/tmp-friends/victo-batch/functions/register_vtubers/logic"
 )
@@ -18,6 +19,7 @@ func init() {
 
 	functions.HTTP("RegisterVtubers", registerVtubers)
 	functions.HTTP("RegisterHashtags", registerHashtags)
+	functions.HTTP("InsertFanartTweets", insertFanartTweets)
 }
 
 func loadEnv() {
@@ -37,4 +39,9 @@ func registerVtubers(w http.ResponseWriter, r *http.Request) {
 func registerHashtags(w http.ResponseWriter, r *http.Request) {
 	rhl := hashtagLogic.NewRegisterHashtagsLogic()
 	rhl.DoExecute()
+}
+
+func insertFanartTweets(w http.ResponseWriter, r *http.Request) {
+	ftl := fanartTweetsLogic.NewFanartTweetsLogic()
+	ftl.DoExecute()
 }

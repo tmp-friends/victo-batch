@@ -24,12 +24,14 @@ import (
 
 // TweetObject is an object representing the database table.
 type TweetObject struct {
+	ID           int         `boil:"id" json:"id" toml:"id" yaml:"id"`
 	TweetID      string      `boil:"tweet_id" json:"tweet_id" toml:"tweet_id" yaml:"tweet_id"`
 	Text         null.String `boil:"text" json:"text,omitempty" toml:"text" yaml:"text,omitempty"`
 	RetweetCount int         `boil:"retweet_count" json:"retweet_count" toml:"retweet_count" yaml:"retweet_count"`
 	LikeCount    int         `boil:"like_count" json:"like_count" toml:"like_count" yaml:"like_count"`
 	AuthorID     string      `boil:"author_id" json:"author_id" toml:"author_id" yaml:"author_id"`
 	TweetURL     string      `boil:"tweet_url" json:"tweet_url" toml:"tweet_url" yaml:"tweet_url"`
+	MediaKey     string      `boil:"media_key" json:"media_key" toml:"media_key" yaml:"media_key"`
 	TweetedAt    time.Time   `boil:"tweeted_at" json:"tweeted_at" toml:"tweeted_at" yaml:"tweeted_at"`
 	CreatedAt    time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt    time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
@@ -40,23 +42,27 @@ type TweetObject struct {
 }
 
 var TweetObjectColumns = struct {
+	ID           string
 	TweetID      string
 	Text         string
 	RetweetCount string
 	LikeCount    string
 	AuthorID     string
 	TweetURL     string
+	MediaKey     string
 	TweetedAt    string
 	CreatedAt    string
 	UpdatedAt    string
 	HashtagID    string
 }{
+	ID:           "id",
 	TweetID:      "tweet_id",
 	Text:         "text",
 	RetweetCount: "retweet_count",
 	LikeCount:    "like_count",
 	AuthorID:     "author_id",
 	TweetURL:     "tweet_url",
+	MediaKey:     "media_key",
 	TweetedAt:    "tweeted_at",
 	CreatedAt:    "created_at",
 	UpdatedAt:    "updated_at",
@@ -64,23 +70,27 @@ var TweetObjectColumns = struct {
 }
 
 var TweetObjectTableColumns = struct {
+	ID           string
 	TweetID      string
 	Text         string
 	RetweetCount string
 	LikeCount    string
 	AuthorID     string
 	TweetURL     string
+	MediaKey     string
 	TweetedAt    string
 	CreatedAt    string
 	UpdatedAt    string
 	HashtagID    string
 }{
+	ID:           "tweet_objects.id",
 	TweetID:      "tweet_objects.tweet_id",
 	Text:         "tweet_objects.text",
 	RetweetCount: "tweet_objects.retweet_count",
 	LikeCount:    "tweet_objects.like_count",
 	AuthorID:     "tweet_objects.author_id",
 	TweetURL:     "tweet_objects.tweet_url",
+	MediaKey:     "tweet_objects.media_key",
 	TweetedAt:    "tweet_objects.tweeted_at",
 	CreatedAt:    "tweet_objects.created_at",
 	UpdatedAt:    "tweet_objects.updated_at",
@@ -128,23 +138,27 @@ func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereI
 func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var TweetObjectWhere = struct {
+	ID           whereHelperint
 	TweetID      whereHelperstring
 	Text         whereHelpernull_String
 	RetweetCount whereHelperint
 	LikeCount    whereHelperint
 	AuthorID     whereHelperstring
 	TweetURL     whereHelperstring
+	MediaKey     whereHelperstring
 	TweetedAt    whereHelpertime_Time
 	CreatedAt    whereHelpertime_Time
 	UpdatedAt    whereHelpertime_Time
 	HashtagID    whereHelperint
 }{
+	ID:           whereHelperint{field: "`tweet_objects`.`id`"},
 	TweetID:      whereHelperstring{field: "`tweet_objects`.`tweet_id`"},
 	Text:         whereHelpernull_String{field: "`tweet_objects`.`text`"},
 	RetweetCount: whereHelperint{field: "`tweet_objects`.`retweet_count`"},
 	LikeCount:    whereHelperint{field: "`tweet_objects`.`like_count`"},
 	AuthorID:     whereHelperstring{field: "`tweet_objects`.`author_id`"},
 	TweetURL:     whereHelperstring{field: "`tweet_objects`.`tweet_url`"},
+	MediaKey:     whereHelperstring{field: "`tweet_objects`.`media_key`"},
 	TweetedAt:    whereHelpertime_Time{field: "`tweet_objects`.`tweeted_at`"},
 	CreatedAt:    whereHelpertime_Time{field: "`tweet_objects`.`created_at`"},
 	UpdatedAt:    whereHelpertime_Time{field: "`tweet_objects`.`updated_at`"},
@@ -168,10 +182,10 @@ func (*tweetObjectR) NewStruct() *tweetObjectR {
 type tweetObjectL struct{}
 
 var (
-	tweetObjectAllColumns            = []string{"tweet_id", "text", "retweet_count", "like_count", "author_id", "tweet_url", "tweeted_at", "created_at", "updated_at", "hashtag_id"}
-	tweetObjectColumnsWithoutDefault = []string{"tweet_id", "text", "retweet_count", "like_count", "author_id", "tweet_url", "tweeted_at", "hashtag_id"}
-	tweetObjectColumnsWithDefault    = []string{"created_at", "updated_at"}
-	tweetObjectPrimaryKeyColumns     = []string{"tweet_id"}
+	tweetObjectAllColumns            = []string{"id", "tweet_id", "text", "retweet_count", "like_count", "author_id", "tweet_url", "media_key", "tweeted_at", "created_at", "updated_at", "hashtag_id"}
+	tweetObjectColumnsWithoutDefault = []string{"tweet_id", "text", "retweet_count", "like_count", "author_id", "tweet_url", "media_key", "tweeted_at", "hashtag_id"}
+	tweetObjectColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
+	tweetObjectPrimaryKeyColumns     = []string{"id"}
 	tweetObjectGeneratedColumns      = []string{}
 )
 
@@ -485,13 +499,13 @@ func TweetObjects(mods ...qm.QueryMod) tweetObjectQuery {
 }
 
 // FindTweetObjectG retrieves a single record by ID.
-func FindTweetObjectG(ctx context.Context, tweetID string, selectCols ...string) (*TweetObject, error) {
-	return FindTweetObject(ctx, boil.GetContextDB(), tweetID, selectCols...)
+func FindTweetObjectG(ctx context.Context, iD int, selectCols ...string) (*TweetObject, error) {
+	return FindTweetObject(ctx, boil.GetContextDB(), iD, selectCols...)
 }
 
 // FindTweetObject retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindTweetObject(ctx context.Context, exec boil.ContextExecutor, tweetID string, selectCols ...string) (*TweetObject, error) {
+func FindTweetObject(ctx context.Context, exec boil.ContextExecutor, iD int, selectCols ...string) (*TweetObject, error) {
 	tweetObjectObj := &TweetObject{}
 
 	sel := "*"
@@ -499,10 +513,10 @@ func FindTweetObject(ctx context.Context, exec boil.ContextExecutor, tweetID str
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from `tweet_objects` where `tweet_id`=?", sel,
+		"select %s from `tweet_objects` where `id`=?", sel,
 	)
 
-	q := queries.Raw(query, tweetID)
+	q := queries.Raw(query, iD)
 
 	err := q.Bind(ctx, exec, tweetObjectObj)
 	if err != nil {
@@ -593,20 +607,31 @@ func (o *TweetObject) Insert(ctx context.Context, exec boil.ContextExecutor, col
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	_, err = exec.ExecContext(ctx, cache.query, vals...)
+	result, err := exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to insert into tweet_objects")
 	}
 
+	var lastID int64
 	var identifierCols []interface{}
 
 	if len(cache.retMapping) == 0 {
 		goto CacheNoHooks
 	}
 
+	lastID, err = result.LastInsertId()
+	if err != nil {
+		return ErrSyncFail
+	}
+
+	o.ID = int(lastID)
+	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == tweetObjectMapping["id"] {
+		goto CacheNoHooks
+	}
+
 	identifierCols = []interface{}{
-		o.TweetID,
+		o.ID,
 	}
 
 	if boil.IsDebug(ctx) {
@@ -785,7 +810,7 @@ func (o *TweetObject) UpsertG(ctx context.Context, updateColumns, insertColumns 
 }
 
 var mySQLTweetObjectUniqueColumns = []string{
-	"tweet_id",
+	"id",
 }
 
 // Upsert attempts an insert using an executor, and does an update or ignore on conflict.
@@ -891,16 +916,27 @@ func (o *TweetObject) Upsert(ctx context.Context, exec boil.ContextExecutor, upd
 		fmt.Fprintln(writer, cache.query)
 		fmt.Fprintln(writer, vals)
 	}
-	_, err = exec.ExecContext(ctx, cache.query, vals...)
+	result, err := exec.ExecContext(ctx, cache.query, vals...)
 
 	if err != nil {
 		return errors.Wrap(err, "models: unable to upsert for tweet_objects")
 	}
 
+	var lastID int64
 	var uniqueMap []uint64
 	var nzUniqueCols []interface{}
 
 	if len(cache.retMapping) == 0 {
+		goto CacheNoHooks
+	}
+
+	lastID, err = result.LastInsertId()
+	if err != nil {
+		return ErrSyncFail
+	}
+
+	o.ID = int(lastID)
+	if lastID != 0 && len(cache.retMapping) == 1 && cache.retMapping[0] == tweetObjectMapping["id"] {
 		goto CacheNoHooks
 	}
 
@@ -948,7 +984,7 @@ func (o *TweetObject) Delete(ctx context.Context, exec boil.ContextExecutor) (in
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), tweetObjectPrimaryKeyMapping)
-	sql := "DELETE FROM `tweet_objects` WHERE `tweet_id`=?"
+	sql := "DELETE FROM `tweet_objects` WHERE `id`=?"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1063,7 +1099,7 @@ func (o *TweetObject) ReloadG(ctx context.Context) error {
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *TweetObject) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindTweetObject(ctx, exec, o.TweetID)
+	ret, err := FindTweetObject(ctx, exec, o.ID)
 	if err != nil {
 		return err
 	}
@@ -1112,21 +1148,21 @@ func (o *TweetObjectSlice) ReloadAll(ctx context.Context, exec boil.ContextExecu
 }
 
 // TweetObjectExistsG checks if the TweetObject row exists.
-func TweetObjectExistsG(ctx context.Context, tweetID string) (bool, error) {
-	return TweetObjectExists(ctx, boil.GetContextDB(), tweetID)
+func TweetObjectExistsG(ctx context.Context, iD int) (bool, error) {
+	return TweetObjectExists(ctx, boil.GetContextDB(), iD)
 }
 
 // TweetObjectExists checks if the TweetObject row exists.
-func TweetObjectExists(ctx context.Context, exec boil.ContextExecutor, tweetID string) (bool, error) {
+func TweetObjectExists(ctx context.Context, exec boil.ContextExecutor, iD int) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from `tweet_objects` where `tweet_id`=? limit 1)"
+	sql := "select exists(select 1 from `tweet_objects` where `id`=? limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, tweetID)
+		fmt.Fprintln(writer, iD)
 	}
-	row := exec.QueryRowContext(ctx, sql, tweetID)
+	row := exec.QueryRowContext(ctx, sql, iD)
 
 	err := row.Scan(&exists)
 	if err != nil {
@@ -1138,5 +1174,5 @@ func TweetObjectExists(ctx context.Context, exec boil.ContextExecutor, tweetID s
 
 // Exists checks if the TweetObject row exists.
 func (o *TweetObject) Exists(ctx context.Context, exec boil.ContextExecutor) (bool, error) {
-	return TweetObjectExists(ctx, exec, o.TweetID)
+	return TweetObjectExists(ctx, exec, o.ID)
 }
