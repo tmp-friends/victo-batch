@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/tmp-friends/victo-batch/functions/struct"
+	"github.com/tmp-friends/victo-batch/functions/dto"
 	"github.com/tmp-friends/victo-batch/functions/register_hashtags/dao"
 )
 
@@ -21,19 +21,19 @@ func NewRegisterHashtagsService() *RegisterHashtagsService {
 	}
 }
 
-func (rhs *RegisterHashtagsService) LoadJsonFile(filepath string) []*struct.Hashtag {
+func (rhs *RegisterHashtagsService) LoadJsonFile(filepath string) []*dto.Hashtag {
 	raw, err := os.ReadFile(filepath)
 	if err != nil {
 		panic(err)
 	}
 
-	hashtags := []*struct.Hashtag{}
+	hashtags := []*dto.Hashtag{}
 	json.Unmarshal(raw, &hashtags)
 
 	return hashtags
 }
 
-func (rhs *RegisterHashtagsService) GetVtuberIds(hashtags []*struct.Hashtag) []*struct.Hashtag {
+func (rhs *RegisterHashtagsService) GetVtuberIds(hashtags []*dto.Hashtag) []*dto.Hashtag {
 	var vtuberNames []string
 	for _, v := range hashtags {
 		vtuberNames = append(vtuberNames, v.VtuberName)
@@ -57,7 +57,7 @@ func (rhs *RegisterHashtagsService) GetVtuberIds(hashtags []*struct.Hashtag) []*
 	return hashtags
 }
 
-func (rhs *RegisterHashtagsService) RegisterHashtags(hashtags []*struct.Hashtag) {
+func (rhs *RegisterHashtagsService) RegisterHashtags(hashtags []*dto.Hashtag) {
 	is_exists := rhs.dao.IsExistsHashtags()
 	rhs.dao.RegisterHashtags(hashtags, is_exists)
 }

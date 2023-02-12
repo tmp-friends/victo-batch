@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/tmp-friends/victo-batch/functions/config"
-	"github.com/tmp-friends/victo-batch/functions/struct"
+	"github.com/tmp-friends/victo-batch/functions/dto"
 	"github.com/tmp-friends/victo-batch/functions/models"
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -23,7 +23,7 @@ func NewRegisterVtubersDao() *RegisterVtubersDao {
 	}
 }
 
-func (rvd *RegisterVtubersDao) RegisterVtubers(vtubers []*struct.Vtuber) {
+func (rvd *RegisterVtubersDao) RegisterVtubers(vtubers []*dto.Vtuber) {
 	for i, v := range vtubers {
 		vtuber := models.Vtuber{
 			// DBのレコードは1から

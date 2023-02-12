@@ -1,4 +1,4 @@
-package struct
+package dto
 
 type Vtuber struct {
 	Id              int    `json:"id"`

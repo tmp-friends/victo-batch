@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/sivchari/gotwtr"
-	"github.com/tmp-friends/victo-batch/functions/struct"
+	"github.com/tmp-friends/victo-batch/functions/dto"
 	"github.com/tmp-friends/victo-batch/functions/lib"
 	"github.com/tmp-friends/victo-batch/functions/register_vtubers/dao"
 )
@@ -28,19 +28,19 @@ func NewRegisterVtubersService() *RegisterVtubersService {
 	}
 }
 
-func (rvs *RegisterVtubersService) LoadJsonFile(filepath string) []*struct.Vtuber {
+func (rvs *RegisterVtubersService) LoadJsonFile(filepath string) []*dto.Vtuber {
 	raw, err := os.ReadFile(filepath)
 	if err != nil {
 		panic(err)
 	}
 
-	vtubers := []*struct.Vtuber{}
+	vtubers := []*dto.Vtuber{}
 	json.Unmarshal(raw, &vtubers)
 
 	return vtubers
 }
 
-func (rvs *RegisterVtubersService) FetchProfileImageUrls(vtubers []*struct.Vtuber) []string {
+func (rvs *RegisterVtubersService) FetchProfileImageUrls(vtubers []*dto.Vtuber) []string {
 	userNames := rvs.extractTwitterUserNames(vtubers)
 
 	usersRes := rvs.requestAPI(userNames)
@@ -59,7 +59,7 @@ func (rvs *RegisterVtubersService) FetchProfileImageUrls(vtubers []*struct.Vtube
 	return profileImageUrls
 }
 
-func (rvs *RegisterVtubersService) extractTwitterUserNames(vtubers []*struct.Vtuber) []string {
+func (rvs *RegisterVtubersService) extractTwitterUserNames(vtubers []*dto.Vtuber) []string {
 	userNames := []string{}
 	for _, v := range vtubers {
 		un := v.TwitterUserName
@@ -97,9 +97,9 @@ func (rvs *RegisterVtubersService) requestAPI(userNames []string) []*gotwtr.User
 
 // 引数のvtubersを更新する必要があるため参照渡し
 func (rvs *RegisterVtubersService) AddProfileImageUrl(
-	vtubers []*struct.Vtuber,
+	vtubers []*dto.Vtuber,
 	profileImageUrls []string,
-) []*struct.Vtuber {
+) []*dto.Vtuber {
 	var emptyIdx int
 	for i, v := range vtubers {
 		if v.TwitterUserName == "" {
@@ -116,6 +116,6 @@ func (rvs *RegisterVtubersService) AddProfileImageUrl(
 	return vtubers
 }
 
-func (rvs *RegisterVtubersService) RegisterVtubers(vtubers []*struct.Vtuber) {
+func (rvs *RegisterVtubersService) RegisterVtubers(vtubers []*dto.Vtuber) {
 	rvs.dao.RegisterVtubers(vtubers)
 }

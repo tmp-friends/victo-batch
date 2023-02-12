@@ -1,16 +1,10 @@
 #!/bin/sh
 # Tips: 開発環境のPlanetScaleはローカルでconnectしておかないと"Can't reach server"エラーになる
-rm -rf dist
-
-# docker-compose up でnode_modulesの名前付きボリュームを作っておく
-docker exec -it \
-  victo-batch \
-  sh -c "npm run build"
-
 gcloud functions deploy \
-  insertFanartTweets \
+  registerVtubers \
   --region=asia-northeast1 \
-  --runtime=nodejs16 \
-  --source=. \
-  --entry-point=insertFanartTweets \
+  --runtime=go119 \
+  --set-env-vars SOURCE_DIR=serverless_function_source_code/ \
+  --source=./functions \
+  --entry-point=RegisterVtubers \
   --trigger-http
