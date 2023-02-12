@@ -35,7 +35,7 @@ func (rvd *RegisterVtubersDao) RegisterVtubers(vtubers []*dto.Vtuber) {
 			Channel:         null.StringFrom(v.Channel),
 		}
 
-		err := vtuber.Upsert(context.Background(), rvd.DB, boil.Infer(), boil.Infer())
+		err := vtuber.Upsert(context.Background(), rvd.DB, boil.Blacklist("created_at"), boil.Infer())
 		if err != nil {
 			panic(err)
 		}

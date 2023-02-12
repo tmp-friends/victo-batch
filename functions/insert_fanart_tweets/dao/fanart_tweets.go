@@ -60,7 +60,7 @@ func (ftd *FanartTweetsDao) InsertMediaObject(media *gotwtr.Media) {
 		URL:      media.URL,
 	}
 
-	err := mo.Upsert(context.Background(), ftd.DB, boil.Infer(), boil.Infer())
+	err := mo.Upsert(context.Background(), ftd.DB, boil.Blacklist("created_at"), boil.Infer())
 	if err != nil {
 		panic(err)
 	}
