@@ -1,4 +1,4 @@
-package struct
+package dto
 
 type Hashtag struct {
 	Name       string `json:"name"`

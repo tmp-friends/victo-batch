@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/tmp-friends/victo-batch/functions/config"
-	"github.com/tmp-friends/victo-batch/functions/struct"
+	"github.com/tmp-friends/victo-batch/functions/dto"
 	"github.com/tmp-friends/victo-batch/functions/models"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -45,7 +45,7 @@ func (rhd *RegisterHashtagsDao) IsExistsHashtags() bool {
 	return is_exists
 }
 
-func (rhd *RegisterHashtagsDao) RegisterHashtags(hashtags []*struct.Hashtag, is_exists bool) {
+func (rhd *RegisterHashtagsDao) RegisterHashtags(hashtags []*dto.Hashtag, is_exists bool) {
 	for i, v := range hashtags {
 		hashtag := models.Hashtag{
 			// DBのレコードは1から
