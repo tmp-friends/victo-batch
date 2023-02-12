@@ -2,7 +2,6 @@ package lib
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
@@ -39,8 +38,8 @@ func (tc *TwitterClient) SearchRecent(
 	keyword string,
 	startTime time.Time,
 	endTime time.Time,
+	nextToken string,
 ) *gotwtr.SearchTweetsResponse {
-	keyword = fmt.Sprintf("#%s -is:retweet has:images", keyword)
 	// @see: https://pkg.go.dev/github.com/sivchari/gotwtr#Client.SearchRecentTweets
 	res, err := tc.client.SearchRecentTweets(
 		context.Background(),
@@ -49,6 +48,7 @@ func (tc *TwitterClient) SearchRecent(
 			StartTime:  startTime,
 			EndTime:    endTime,
 			MaxResults: 100,
+			NextToken:  nextToken,
 			Expansions: []gotwtr.Expansion{
 				gotwtr.ExpansionAuthorID,
 				gotwtr.ExpansionAttachmentsMediaKeys,
@@ -65,6 +65,15 @@ func (tc *TwitterClient) SearchRecent(
 	)
 	if err != nil {
 		panic(err)
+	}
+
+	// 100件/req しか取得できないので再帰処理
+	if res.Meta.NextToken != "" {
+		resNext := tc.SearchRecent(keyword, startTime, endTime, res.Meta.NextToken)
+
+		res.Tweets = append(res.Tweets, resNext.Tweets...)
+		res.Includes.Media = append(res.Includes.Media, resNext.Includes.Media...)
+		res.Meta.ResultCount += resNext.Meta.ResultCount
 	}
 
 	return res

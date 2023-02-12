@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -34,7 +35,8 @@ func (fts *FanartTweetsService) FetchTweets(
 	hashtagName string,
 	times map[string]time.Time,
 ) *gotwtr.SearchTweetsResponse {
-	tweetsRes := fts.lib.SearchRecent(hashtagName, times["startTime"], times["endTime"])
+	keyword := fmt.Sprintf("#%s -is:retweet has:images", hashtagName)
+	tweetsRes := fts.lib.SearchRecent(keyword, times["startTime"], times["endTime"], "")
 
 	return tweetsRes
 }
