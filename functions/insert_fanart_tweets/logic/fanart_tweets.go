@@ -1,10 +1,13 @@
 package logic
 
 import (
+	"log"
 	"time"
 
 	"github.com/tmp-friends/victo-batch/functions/insert_fanart_tweets/service"
 )
+
+var layout = "2022-01-01 00:00:00"
 
 type FanartTweetsLogic struct {
 	service *service.FanartTweetsService
@@ -22,10 +25,23 @@ func (ftl *FanartTweetsLogic) DoExecute() {
 	hashtags := ftl.service.GetHashtags()
 
 	tm := ftl.setWithinTime()
+	log.Printf(
+		"Target within time: %s ~ %s\n",
+		tm["startTime"].Format(time.RFC3339),
+		tm["endTime"].Format(time.RFC3339),
+	)
+
 	for _, v := range hashtags {
 		tweetsRes := ftl.service.FetchTweets(v.Name, tm)
+		log.Printf(
+			"%s\n- Result count: %d\n- Oldest tweet id: %s\n- Newest tweet id: %s",
+			v.Name,
+			tweetsRes.Meta.ResultCount,
+			tweetsRes.Meta.OldestID,
+			tweetsRes.Meta.NewestID,
+		)
 
-		if tweetsRes.Tweets == nil {
+		if tweetsRes.Meta.ResultCount == 0 {
 			continue
 		}
 
