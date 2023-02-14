@@ -38,43 +38,57 @@ func (tc *TwitterClient) SearchRecent(
 	keyword string,
 	startTime time.Time,
 	endTime time.Time,
-	nextToken string,
-) *gotwtr.SearchTweetsResponse {
-	// @see: https://pkg.go.dev/github.com/sivchari/gotwtr#Client.SearchRecentTweets
-	res, err := tc.client.SearchRecentTweets(
-		context.Background(),
-		keyword,
-		&gotwtr.SearchTweetsOption{
-			StartTime:  startTime,
-			EndTime:    endTime,
-			MaxResults: 100,
-			NextToken:  nextToken,
-			Expansions: []gotwtr.Expansion{
-				gotwtr.ExpansionAuthorID,
-				gotwtr.ExpansionAttachmentsMediaKeys,
+) ([]*gotwtr.Tweet, []*gotwtr.Media, int) {
+	var tweetsRes []*gotwtr.Tweet
+	var mediaRes []*gotwtr.Media
+	var resultCount int
+
+	var nextToken string
+	// 無限ループを避けるため連続10回(=1000件)までのrequestとする
+	for i := 0; i < 10; i++ {
+		// @see: https://pkg.go.dev/github.com/sivchari/gotwtr#Client.SearchRecentTweets
+		res, err := tc.client.SearchRecentTweets(
+			context.Background(),
+			keyword,
+			&gotwtr.SearchTweetsOption{
+				StartTime:  startTime,
+				EndTime:    endTime,
+				MaxResults: 100,
+				NextToken:  nextToken,
+				Expansions: []gotwtr.Expansion{
+					gotwtr.ExpansionAuthorID,
+					gotwtr.ExpansionAttachmentsMediaKeys,
+				},
+				TweetFields: []gotwtr.TweetField{
+					gotwtr.TweetFieldCreatedAt,
+					gotwtr.TweetFieldPublicMetrics,
+				},
+				MediaFields: []gotwtr.MediaField{
+					gotwtr.MediaFieldPreviewImageURL,
+					gotwtr.MediaFieldURL,
+				},
 			},
-			TweetFields: []gotwtr.TweetField{
-				gotwtr.TweetFieldCreatedAt,
-				gotwtr.TweetFieldPublicMetrics,
-			},
-			MediaFields: []gotwtr.MediaField{
-				gotwtr.MediaFieldPreviewImageURL,
-				gotwtr.MediaFieldURL,
-			},
-		},
-	)
-	if err != nil {
-		panic(err)
+		)
+		if err != nil {
+			panic(err)
+		}
+
+		// res.Includes.Mediaのappend時にヌルポになるため早期break
+		if res.Meta.ResultCount == 0 {
+			break
+		}
+
+		tweetsRes = append(tweetsRes, res.Tweets...)
+		mediaRes = append(mediaRes, res.Includes.Media...)
+		resultCount += res.Meta.ResultCount
+
+		// NextTokenが空になる or 前回のreqとTokenが同じ になるまで回す
+		if res.Meta.NextToken == "" || res.Meta.NextToken == nextToken {
+			break
+		}
+
+		nextToken = res.Meta.NextToken
 	}
 
-	// 100件/req しか取得できないので再帰処理
-	if res.Meta.NextToken != "" {
-		resNext := tc.SearchRecent(keyword, startTime, endTime, res.Meta.NextToken)
-
-		res.Tweets = append(res.Tweets, resNext.Tweets...)
-		res.Includes.Media = append(res.Includes.Media, resNext.Includes.Media...)
-		res.Meta.ResultCount += resNext.Meta.ResultCount
-	}
-
-	return res
+	return tweetsRes, mediaRes, resultCount
 }
