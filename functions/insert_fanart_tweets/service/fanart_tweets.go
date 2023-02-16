@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -32,16 +33,23 @@ func (fts *FanartTweetsService) GetHashtags() models.HashtagSlice {
 
 func (fts *FanartTweetsService) FetchTweets(
 	hashtagName string,
-	times map[string]time.Time,
-) *gotwtr.SearchTweetsResponse {
-	tweetsRes := fts.lib.SearchRecent(hashtagName, times["startTime"], times["endTime"])
+	startTime time.Time,
+	endTime time.Time,
+) ([]*gotwtr.Tweet, []*gotwtr.Media, int) {
+	keyword := fmt.Sprintf("#%s -is:retweet has:images", hashtagName)
+	tweets, media, resultCount := fts.lib.SearchRecent(keyword, startTime, endTime)
 
-	return tweetsRes
+	return tweets, media, resultCount
 }
 
 func (fts *FanartTweetsService) InsertTweets(hashtagId int, tweets []*gotwtr.Tweet) {
 	for _, v := range tweets {
 		m := fts.extractTweetUrl(v.Text)
+
+		// HACK: Tweetに付随したMediaKeysを取得する際、取得できずにヌルポになる事象がある
+		if v.Attachments == nil {
+			continue
+		}
 
 		// 1つのツイートに対してメディアが配列でついているためforで回す
 		for _, mediaKey := range v.Attachments.MediaKeys {

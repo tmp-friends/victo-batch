@@ -1,6 +1,7 @@
 package dto
 
 type Vtuber struct {
+	Id              int    `json:"id"`
 	Name            string `json:"name"`
 	BelongsTo       string `json:"belongs_to"`
 	ProfileImageURL string `json:"profile_image_url"`

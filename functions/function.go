@@ -17,6 +17,8 @@ import (
 func init() {
 	loadEnv()
 
+	// 環境変数でTargetを指定する
+	// ex. export FUNCTION_TARGET=HelloWorld
 	functions.HTTP("RegisterVtubers", registerVtubers)
 	functions.HTTP("RegisterHashtags", registerHashtags)
 	functions.HTTP("InsertFanartTweets", insertFanartTweets)

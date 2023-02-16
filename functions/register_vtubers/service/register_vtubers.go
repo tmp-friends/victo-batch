@@ -7,8 +7,8 @@ import (
 
 	"github.com/sivchari/gotwtr"
 	"github.com/tmp-friends/victo-batch/functions/dto"
+	"github.com/tmp-friends/victo-batch/functions/lib"
 	"github.com/tmp-friends/victo-batch/functions/register_vtubers/dao"
-	"github.com/tmp-friends/victo-batch/functions/register_vtubers/lib"
 )
 
 const REQ_LIMIT = 100

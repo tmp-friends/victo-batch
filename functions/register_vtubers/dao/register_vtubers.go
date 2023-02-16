@@ -24,8 +24,10 @@ func NewRegisterVtubersDao() *RegisterVtubersDao {
 }
 
 func (rvd *RegisterVtubersDao) RegisterVtubers(vtubers []*dto.Vtuber) {
-	for _, v := range vtubers {
+	for i, v := range vtubers {
 		vtuber := models.Vtuber{
+			// DBのレコードは1から
+			ID:              i + 1,
 			Name:            v.Name,
 			BelongsTo:       null.StringFrom(v.BelongsTo),
 			ProfileImageURL: null.StringFrom(v.ProfileImageURL),
@@ -33,6 +35,9 @@ func (rvd *RegisterVtubersDao) RegisterVtubers(vtubers []*dto.Vtuber) {
 			Channel:         null.StringFrom(v.Channel),
 		}
 
-		vtuber.Insert(context.Background(), rvd.DB, boil.Infer())
+		err := vtuber.Upsert(context.Background(), rvd.DB, boil.Blacklist("created_at"), boil.Infer())
+		if err != nil {
+			panic(err)
+		}
 	}
 }

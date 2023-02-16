@@ -1,0 +1,13 @@
+pkgname = "models"
+output = "models"
+wipe = true
+no-tests = true
+add-global-variants = true
+add-soft-deletes = true
+
+[mysql]
+dbname = "victo"
+host = "ap-northeast.connect.psdb.cloud"
+port = ""
+user = "3ml5y7zmcgyxiougjo6n"
+pass = "pscale_pw_URlBb3LNV37bd3oT0yil0O8jAjdq9rEfkkb8Qs0IMpq"

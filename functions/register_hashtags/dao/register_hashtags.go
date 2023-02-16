@@ -54,7 +54,7 @@ func (rhd *RegisterHashtagsDao) RegisterHashtags(hashtags []*dto.Hashtag, is_exi
 			VtuberID: v.VtuberId,
 		}
 
-		err := hashtag.Upsert(context.Background(), rhd.DB, boil.Infer(), boil.Infer())
+		err := hashtag.Upsert(context.Background(), rhd.DB, boil.Blacklist("created_at"), boil.Infer())
 		if err != nil {
 			panic(err)
 		}
