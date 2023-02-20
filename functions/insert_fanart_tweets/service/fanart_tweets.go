@@ -42,25 +42,26 @@ func (fts *FanartTweetsService) FetchTweets(
 	return tweets, media, resultCount
 }
 
-func (fts *FanartTweetsService) InsertTweets(hashtagId int, tweets []*gotwtr.Tweet) {
-	for _, v := range tweets {
-		m := fts.extractTweetUrl(v.Text)
+func (fts *FanartTweetsService) Insert(hashtagId int, tweets []*gotwtr.Tweet, media []*gotwtr.Media) {
+	for _, t := range tweets {
+		m := fts.extractTweetUrl(t.Text)
 
 		// HACK: Tweetに付随したMediaKeysを取得する際、取得できずにヌルポになる事象がある
-		if v.Attachments == nil {
+		if t.Attachments == nil {
 			continue
 		}
 
-		// 1つのツイートに対してメディアが配列でついているためforで回す
-		for _, mediaKey := range v.Attachments.MediaKeys {
-			fts.dao.InsertTweetObject(hashtagId, v, m, mediaKey)
-		}
-	}
-}
+		fts.dao.InsertTweetObject(hashtagId, t, m)
 
-func (fts *FanartTweetsService) InsertMedia(media []*gotwtr.Media) {
-	for _, v := range media {
-		fts.dao.InsertMediaObject(v)
+		// 1つのツイートに対してメディアが配列でついているためforで回す
+		for _, mediaKey := range t.Attachments.MediaKeys {
+			for i, m := range media {
+				if m.MediaKey != mediaKey {
+					continue
+				}
+				fts.dao.InsertMediaObject(media[i], t.ID)
+			}
+		}
 	}
 }
 
