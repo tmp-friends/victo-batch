@@ -48,8 +48,7 @@ func (ftl *FanartTweetsLogic) DoExecute() {
 			tweets[0].ID,
 		)
 
-		ftl.service.InsertTweets(v.ID, tweets)
-		ftl.service.InsertMedia(media)
+		ftl.service.Insert(v.ID, tweets, media)
 	}
 }
 
