@@ -34,14 +34,14 @@ func (ftd *FanartTweetsDao) GetHashtags() models.HashtagSlice {
 	return hashtags
 }
 
-func (ftd *FanartTweetsDao) InsertTweetObject(hashtagId int, tweet *gotwtr.Tweet, m map[string]string) {
+func (ftd *FanartTweetsDao) InsertTweetObject(tweet *gotwtr.Tweet, url string, hashtagId int) {
 	to := models.TweetObject{
 		TweetID:      string(tweet.ID),
-		Text:         null.StringFrom(m["text"]),
+		Text:         null.StringFrom(tweet.Text),
 		RetweetCount: int(tweet.PublicMetrics.RetweetCount),
 		LikeCount:    int(tweet.PublicMetrics.LikeCount),
 		AuthorID:     tweet.AuthorID,
-		TweetURL:     m["url"],
+		TweetURL:     url,
 		TweetedAt:    ftd.strToTime(tweet.CreatedAt),
 		HashtagID:    hashtagId,
 	}
