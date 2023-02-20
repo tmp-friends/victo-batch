@@ -44,14 +44,15 @@ func (fts *FanartTweetsService) FetchTweets(
 
 func (fts *FanartTweetsService) Insert(hashtagId int, tweets []*gotwtr.Tweet, media []*gotwtr.Media) {
 	for _, t := range tweets {
-		m := fts.extractTweetUrl(t.Text)
-
 		// HACK: Tweetに付随したMediaKeysを取得する際、取得できずにヌルポになる事象がある
 		if t.Attachments == nil {
 			continue
 		}
 
-		fts.dao.InsertTweetObject(hashtagId, t, m)
+		var url string
+		url, t.Text = fts.extractTweetUrl(t.Text)
+
+		fts.dao.InsertTweetObject(t, url, hashtagId)
 
 		// 1つのツイートに対してメディアが配列でついているためforで回す
 		for _, mediaKey := range t.Attachments.MediaKeys {
@@ -66,13 +67,12 @@ func (fts *FanartTweetsService) Insert(hashtagId int, tweets []*gotwtr.Tweet, me
 }
 
 // ツイート本文に含まれているtweet_urlを抽出する処理
-func (fts *FanartTweetsService) extractTweetUrl(text string) map[string]string {
+func (fts *FanartTweetsService) extractTweetUrl(text string) (string, string) {
 	// https://t.co/<空白以外の一文字以上>
 	re := regexp.MustCompile(`https://t.co/\S*$`)
-	extractedUrl := re.FindString(text)
-	tweetText := strings.Replace(text, extractedUrl, "", -1)
+	url := re.FindString(text)
 
-	m := map[string]string{"url": extractedUrl, "text": tweetText}
+	extractedText := strings.Replace(text, url, "", -1)
 
-	return m
+	return url, extractedText
 }
