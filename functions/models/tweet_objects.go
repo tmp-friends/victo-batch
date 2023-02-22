@@ -30,7 +30,7 @@ type TweetObject struct {
 	RetweetCount int         `boil:"retweet_count" json:"retweet_count" toml:"retweet_count" yaml:"retweet_count"`
 	LikeCount    int         `boil:"like_count" json:"like_count" toml:"like_count" yaml:"like_count"`
 	AuthorID     string      `boil:"author_id" json:"author_id" toml:"author_id" yaml:"author_id"`
-	TweetURL     string      `boil:"tweet_url" json:"tweet_url" toml:"tweet_url" yaml:"tweet_url"`
+	URL          string      `boil:"url" json:"url" toml:"url" yaml:"url"`
 	TweetedAt    time.Time   `boil:"tweeted_at" json:"tweeted_at" toml:"tweeted_at" yaml:"tweeted_at"`
 	CreatedAt    time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt    time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
@@ -47,7 +47,7 @@ var TweetObjectColumns = struct {
 	RetweetCount string
 	LikeCount    string
 	AuthorID     string
-	TweetURL     string
+	URL          string
 	TweetedAt    string
 	CreatedAt    string
 	UpdatedAt    string
@@ -59,7 +59,7 @@ var TweetObjectColumns = struct {
 	RetweetCount: "retweet_count",
 	LikeCount:    "like_count",
 	AuthorID:     "author_id",
-	TweetURL:     "tweet_url",
+	URL:          "url",
 	TweetedAt:    "tweeted_at",
 	CreatedAt:    "created_at",
 	UpdatedAt:    "updated_at",
@@ -73,7 +73,7 @@ var TweetObjectTableColumns = struct {
 	RetweetCount string
 	LikeCount    string
 	AuthorID     string
-	TweetURL     string
+	URL          string
 	TweetedAt    string
 	CreatedAt    string
 	UpdatedAt    string
@@ -85,7 +85,7 @@ var TweetObjectTableColumns = struct {
 	RetweetCount: "tweet_objects.retweet_count",
 	LikeCount:    "tweet_objects.like_count",
 	AuthorID:     "tweet_objects.author_id",
-	TweetURL:     "tweet_objects.tweet_url",
+	URL:          "tweet_objects.url",
 	TweetedAt:    "tweet_objects.tweeted_at",
 	CreatedAt:    "tweet_objects.created_at",
 	UpdatedAt:    "tweet_objects.updated_at",
@@ -139,7 +139,7 @@ var TweetObjectWhere = struct {
 	RetweetCount whereHelperint
 	LikeCount    whereHelperint
 	AuthorID     whereHelperstring
-	TweetURL     whereHelperstring
+	URL          whereHelperstring
 	TweetedAt    whereHelpertime_Time
 	CreatedAt    whereHelpertime_Time
 	UpdatedAt    whereHelpertime_Time
@@ -151,7 +151,7 @@ var TweetObjectWhere = struct {
 	RetweetCount: whereHelperint{field: "`tweet_objects`.`retweet_count`"},
 	LikeCount:    whereHelperint{field: "`tweet_objects`.`like_count`"},
 	AuthorID:     whereHelperstring{field: "`tweet_objects`.`author_id`"},
-	TweetURL:     whereHelperstring{field: "`tweet_objects`.`tweet_url`"},
+	URL:          whereHelperstring{field: "`tweet_objects`.`url`"},
 	TweetedAt:    whereHelpertime_Time{field: "`tweet_objects`.`tweeted_at`"},
 	CreatedAt:    whereHelpertime_Time{field: "`tweet_objects`.`created_at`"},
 	UpdatedAt:    whereHelpertime_Time{field: "`tweet_objects`.`updated_at`"},
@@ -175,8 +175,8 @@ func (*tweetObjectR) NewStruct() *tweetObjectR {
 type tweetObjectL struct{}
 
 var (
-	tweetObjectAllColumns            = []string{"id", "tweet_id", "text", "retweet_count", "like_count", "author_id", "tweet_url", "tweeted_at", "created_at", "updated_at", "hashtag_id"}
-	tweetObjectColumnsWithoutDefault = []string{"tweet_id", "text", "retweet_count", "like_count", "author_id", "tweet_url", "tweeted_at", "hashtag_id"}
+	tweetObjectAllColumns            = []string{"id", "tweet_id", "text", "retweet_count", "like_count", "author_id", "url", "tweeted_at", "created_at", "updated_at", "hashtag_id"}
+	tweetObjectColumnsWithoutDefault = []string{"tweet_id", "text", "retweet_count", "like_count", "author_id", "url", "tweeted_at", "hashtag_id"}
 	tweetObjectColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	tweetObjectPrimaryKeyColumns     = []string{"id"}
 	tweetObjectGeneratedColumns      = []string{}
