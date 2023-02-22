@@ -41,7 +41,7 @@ func (ftd *FanartTweetsDao) InsertTweetObject(tweet *gotwtr.Tweet, url string, h
 		RetweetCount: int(tweet.PublicMetrics.RetweetCount),
 		LikeCount:    int(tweet.PublicMetrics.LikeCount),
 		AuthorID:     tweet.AuthorID,
-		TweetURL:     url,
+		URL:          url,
 		TweetedAt:    ftd.strToTime(tweet.CreatedAt),
 		HashtagID:    hashtagId,
 	}
