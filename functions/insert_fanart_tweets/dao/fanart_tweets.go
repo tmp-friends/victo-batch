@@ -34,15 +34,14 @@ func (ftd *FanartTweetsDao) GetHashtags() models.HashtagSlice {
 	return hashtags
 }
 
-func (ftd *FanartTweetsDao) InsertTweetObject(hashtagId int, tweet *gotwtr.Tweet, m map[string]string, mediaKey string) {
+func (ftd *FanartTweetsDao) InsertTweetObject(tweet *gotwtr.Tweet, url string, hashtagId int) {
 	to := models.TweetObject{
 		TweetID:      string(tweet.ID),
-		Text:         null.StringFrom(m["text"]),
+		Text:         null.StringFrom(tweet.Text),
 		RetweetCount: int(tweet.PublicMetrics.RetweetCount),
 		LikeCount:    int(tweet.PublicMetrics.LikeCount),
 		AuthorID:     tweet.AuthorID,
-		TweetURL:     m["url"],
-		MediaKey:     mediaKey,
+		URL:          url,
 		TweetedAt:    ftd.strToTime(tweet.CreatedAt),
 		HashtagID:    hashtagId,
 	}
@@ -53,11 +52,12 @@ func (ftd *FanartTweetsDao) InsertTweetObject(hashtagId int, tweet *gotwtr.Tweet
 	}
 }
 
-func (ftd *FanartTweetsDao) InsertMediaObject(media *gotwtr.Media) {
+func (ftd *FanartTweetsDao) InsertMediaObject(media *gotwtr.Media, tweetId string) {
 	mo := models.MediaObject{
 		MediaKey: media.MediaKey,
 		Type:     media.Type,
 		URL:      media.URL,
+		TweetID:  tweetId,
 	}
 
 	err := mo.Upsert(context.Background(), ftd.DB, boil.Blacklist("created_at"), boil.Infer())
