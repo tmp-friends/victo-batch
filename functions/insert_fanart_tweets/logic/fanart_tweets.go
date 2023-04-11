@@ -7,7 +7,8 @@ import (
 	"github.com/tmp-friends/victo-batch/functions/insert_fanart_tweets/service"
 )
 
-var layout = "2022-01-01 00:00:00"
+// Goのtime->string変換の仕様
+var LAYOUT = "2006-01-02_15:04:05_JST"
 
 type FanartTweetsLogic struct {
 	service *service.FanartTweetsService
@@ -25,35 +26,32 @@ func (ftl *FanartTweetsLogic) DoExecute() {
 	hashtags := ftl.service.GetHashtags()
 
 	startTime, endTime := ftl.setWithinTime()
-	log.Printf(
-		"Target within time: %s ~ %s\n",
-		startTime.Format(time.RFC3339),
-		endTime.Format(time.RFC3339),
-	)
+	log.Printf("Target within time: %s ~ %s\n", startTime, endTime)
 
 	for _, v := range hashtags {
 		log.Print(v.Name)
 
-		tweets, media, resultCount := ftl.service.FetchTweets(v.Name, startTime, endTime)
+		tweets := ftl.service.FetchTweets(v.Name, startTime, endTime)
 
-		if resultCount == 0 {
+		if len(tweets) == 0 {
+			log.Print("- Result count: 0\n")
 			continue
 		}
 
 		log.Printf(
 			"- Result count: %d\n- Oldest tweet id: %s\n- Newest tweet id: %s",
-			resultCount,
+			len(tweets),
 			// 新しい順に取得していく
 			tweets[len(tweets)-1].ID,
 			tweets[0].ID,
 		)
 
-		ftl.service.Insert(v.ID, tweets, media)
+		ftl.service.Insert(v.ID, tweets)
 	}
 }
 
 // (日本標準時間で)Twitter検索を実施する開始と終了の時刻を取得
-func (ftl *FanartTweetsLogic) setWithinTime() (time.Time, time.Time) {
+func (ftl *FanartTweetsLogic) setWithinTime() (string, string) {
 	// @see: https://tutuz-tech.hatenablog.com/entry/2021/01/30/192956
 	jst, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
@@ -63,26 +61,26 @@ func (ftl *FanartTweetsLogic) setWithinTime() (time.Time, time.Time) {
 	// 現在時刻の取得
 	nowJST := time.Now().In(jst)
 
-	yesterdayMidnight := time.Date(
+	startTime := time.Date(
 		nowJST.Year(),
 		nowJST.Month(),
 		nowJST.Day()-1,
-		0,
+		4,
 		0,
 		0,
 		0,
 		jst,
-	)
-	todayMidnight := time.Date(
+	).Format(LAYOUT)
+	endTime := time.Date(
 		nowJST.Year(),
 		nowJST.Month(),
 		nowJST.Day(),
-		0,
+		4,
 		0,
 		0,
 		0,
 		jst,
-	)
+	).Format(LAYOUT)
 
-	return yesterdayMidnight, todayMidnight
+	return startTime, endTime
 }
