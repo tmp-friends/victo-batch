@@ -1,3 +1,5 @@
+// Deprecated
+// @see: lib/twitter_scraper.go
 package lib
 
 import (

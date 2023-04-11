@@ -3,9 +3,8 @@ package dao
 import (
 	"context"
 	"database/sql"
-	"time"
 
-	"github.com/sivchari/gotwtr"
+	twitterscraper "github.com/n0madic/twitter-scraper"
 	"github.com/tmp-friends/victo-batch/functions/config"
 	"github.com/tmp-friends/victo-batch/functions/models"
 	"github.com/volatiletech/null/v8"
@@ -34,44 +33,43 @@ func (ftd *FanartTweetsDao) GetHashtags() models.HashtagSlice {
 	return hashtags
 }
 
-func (ftd *FanartTweetsDao) InsertTweetObject(tweet *gotwtr.Tweet, url string, hashtagId int) {
+func (ftd *FanartTweetsDao) InsertTweetObject(tweet *twitterscraper.Tweet, hashtagId int) {
 	to := models.TweetObject{
-		TweetID:      string(tweet.ID),
+		ID:           string(tweet.ID),
 		Text:         null.StringFrom(tweet.Text),
-		RetweetCount: int(tweet.PublicMetrics.RetweetCount),
-		LikeCount:    int(tweet.PublicMetrics.LikeCount),
-		AuthorID:     tweet.AuthorID,
-		URL:          url,
-		TweetedAt:    ftd.strToTime(tweet.CreatedAt),
+		RetweetCount: int(tweet.Retweets),
+		LikeCount:    int(tweet.Likes),
+		AuthorID:     tweet.UserID,
+		URL:          tweet.PermanentURL,
+		TweetedAt:    tweet.TimeParsed,
 		HashtagID:    hashtagId,
 	}
 
-	err := to.Insert(context.Background(), ftd.DB, boil.Infer())
+	err := to.Upsert(context.Background(), ftd.DB, boil.Blacklist("created_at"), boil.Infer())
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (ftd *FanartTweetsDao) InsertMediaObject(media *gotwtr.Media, tweetId string) {
-	mo := models.MediaObject{
-		MediaKey: media.MediaKey,
-		Type:     media.Type,
-		URL:      media.URL,
-		TweetID:  tweetId,
+func (ftd *FanartTweetsDao) InsertMediaObject(tweet *twitterscraper.Tweet) {
+	var mediaType string
+	switch true {
+	case len(tweet.Videos) > 1:
+		mediaType = "video"
+	default:
+		mediaType = "photo"
 	}
 
-	err := mo.Upsert(context.Background(), ftd.DB, boil.Blacklist("created_at"), boil.Infer())
-	if err != nil {
-		panic(err)
-	}
-}
+	for _, photoUrl := range tweet.Photos {
+		mo := models.MediaObject{
+			Type:    mediaType,
+			URL:     photoUrl,
+			TweetID: tweet.ID,
+		}
 
-func (ftd *FanartTweetsDao) strToTime(str string) time.Time {
-	// RFC3339 ex."2006-01-02T15:04:05Z07:00"
-	t, err := time.Parse(time.RFC3339, str)
-	if err != nil {
-		panic(err)
+		err := mo.Insert(context.Background(), ftd.DB, boil.Infer())
+		if err != nil {
+			panic(err)
+		}
 	}
-
-	return t
 }
