@@ -22,11 +22,14 @@ target_func=$1
 entry_point=${target_func^}
 
 # Tips: 開発環境のPlanetScaleはローカルでconnectしておかないと"Can't reach server"エラーになる
-gcloud functions deploy \
+# タイムアウトが1hに延びるため第2世代にする
+gcloud beta functions deploy \
   $target_func \
-  --region=asia-northeast1 \
-  --runtime=go119 \
-  --set-env-vars SOURCE_DIR=serverless_function_source_code/ \
-  --source=./functions \
-  --entry-point=$entry_point \
-  --trigger-http
+  --gen2 \
+  --trigger-http \
+  --region asia-northeast1 \
+  --runtime go119 \
+  --memory 128MiB \
+  --source ./functions \
+  --entry-point $entry_point \
+  --set-env-vars SOURCE_DIR=serverless_function_source_code/
