@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/tmp-friends/victo-batch/functions/dto"
-	"github.com/tmp-friends/victo-batch/functions/register_hashtags/dao"
+	"github.com/tmp-friends/victo-batch/functions/pkg/dto"
+	"github.com/tmp-friends/victo-batch/functions/pkg/register_hashtags/dao"
 )
 
 type RegisterHashtagsService struct {

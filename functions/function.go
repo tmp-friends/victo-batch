@@ -8,9 +8,9 @@ import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/joho/godotenv"
 
-	fanartTweetsLogic "github.com/tmp-friends/victo-batch/functions/insert_fanart_tweets/logic"
-	hashtagLogic "github.com/tmp-friends/victo-batch/functions/register_hashtags/logic"
-	vtuberLogic "github.com/tmp-friends/victo-batch/functions/register_vtubers/logic"
+	fanartTweetsLogic "github.com/tmp-friends/victo-batch/functions/pkg/insert_fanart_tweets/logic"
+	hashtagLogic "github.com/tmp-friends/victo-batch/functions/pkg/register_hashtags/logic"
+	vtuberLogic "github.com/tmp-friends/victo-batch/functions/pkg/register_vtubers/logic"
 )
 
 // Targetの定義
@@ -18,14 +18,13 @@ func init() {
 	loadEnv()
 
 	// 環境変数でTargetを指定する
-	// ex. export FUNCTION_TARGET=HelloWorld
 	functions.HTTP("RegisterVtubers", registerVtubers)
 	functions.HTTP("RegisterHashtags", registerHashtags)
 	functions.HTTP("InsertFanartTweets", insertFanartTweets)
 }
 
 func loadEnv() {
-	// SOURCE_DIR -> dev: "", prod: "serverless_function_source_code/"
+	// SOURCE_DIR -> 開発: "", 本番: "serverless_function_source_code/"
 	err := godotenv.Load(os.Getenv("SOURCE_DIR") + ".env")
 
 	if err != nil {

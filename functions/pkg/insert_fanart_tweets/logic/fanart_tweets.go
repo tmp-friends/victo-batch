@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/tmp-friends/victo-batch/functions/insert_fanart_tweets/service"
+	"github.com/tmp-friends/victo-batch/functions/pkg/insert_fanart_tweets/service"
 )
 
 // Goのtime->string変換の仕様
@@ -32,11 +32,12 @@ func (ftl *FanartTweetsLogic) DoExecute() {
 		log.Print(v.Name)
 
 		tweets := ftl.service.FetchTweets(v.Name, startTime, endTime)
-
 		if len(tweets) == 0 {
 			log.Print("- Result count: 0\n")
 			continue
 		}
+
+		authors := ftl.service.GetAuthors(tweets)
 
 		log.Printf(
 			"- Result count: %d\n- Oldest tweet id: %s\n- Newest tweet id: %s",
@@ -47,6 +48,7 @@ func (ftl *FanartTweetsLogic) DoExecute() {
 		)
 
 		ftl.service.Insert(v.ID, tweets)
+		ftl.service.InsertAuthors(authors)
 	}
 }
 

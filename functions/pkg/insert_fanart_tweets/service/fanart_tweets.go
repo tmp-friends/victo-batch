@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	twitterscraper "github.com/n0madic/twitter-scraper"
-	"github.com/tmp-friends/victo-batch/functions/insert_fanart_tweets/dao"
-	"github.com/tmp-friends/victo-batch/functions/lib"
 	"github.com/tmp-friends/victo-batch/functions/models"
+	"github.com/tmp-friends/victo-batch/functions/pkg/insert_fanart_tweets/dao"
+	"github.com/tmp-friends/victo-batch/functions/pkg/lib"
 )
 
 type FanartTweetsService struct {
@@ -34,7 +34,7 @@ func (fts *FanartTweetsService) FetchTweets(
 	endTime string,
 ) []*twitterscraper.Tweet {
 	keyword := fmt.Sprintf(
-		"'%s' -filter:retweet filter:images since:%s until:%s",
+		"\"#%s\" -filter:retweet filter:images since:%s until:%s",
 		hashtagName,
 		startTime,
 		endTime,
@@ -45,9 +45,27 @@ func (fts *FanartTweetsService) FetchTweets(
 	return tweets
 }
 
+func (fts *FanartTweetsService) GetAuthors(tweets []*twitterscraper.Tweet) []*twitterscraper.Profile {
+	var authors []*twitterscraper.Profile
+
+	// authorId配列に対して一括で取得できないため、一件ずつ取得
+	for _, t := range tweets {
+		profile := fts.lib.GetProfile(t.Username)
+		authors = append(authors, profile)
+	}
+
+	return authors
+}
+
 func (fts *FanartTweetsService) Insert(hashtagId int, tweets []*twitterscraper.Tweet) {
 	for _, t := range tweets {
 		fts.dao.InsertTweetObject(t, hashtagId)
 		fts.dao.InsertMediaObject(t)
+	}
+}
+
+func (fts *FanartTweetsService) InsertAuthors(authors []*twitterscraper.Profile) {
+	for _, a := range authors {
+		fts.dao.InsertAuthor(a)
 	}
 }

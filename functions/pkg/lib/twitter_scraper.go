@@ -15,8 +15,8 @@ type TwitterScraper struct {
 
 func NewTwitterScraper() *TwitterScraper {
 	scraper := twitterscraper.New()
-	scraper.WithDelay(5)
 	scraper.SetSearchMode(twitterscraper.SearchLatest)
+	scraper.WithDelay(1)
 
 	return &TwitterScraper{
 		scraper,
@@ -34,4 +34,13 @@ func (ts *TwitterScraper) SearchTweets(keyword string) []*twitterscraper.Tweet {
 	}
 
 	return tweets
+}
+
+func (ts *TwitterScraper) GetProfile(username string) *twitterscraper.Profile {
+	profile, err := ts.scraper.GetProfile(username)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &profile
 }

@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/tmp-friends/victo-batch/functions/config"
-	"github.com/tmp-friends/victo-batch/functions/dto"
 	"github.com/tmp-friends/victo-batch/functions/models"
+	"github.com/tmp-friends/victo-batch/functions/pkg/config"
+	"github.com/tmp-friends/victo-batch/functions/pkg/dto"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )

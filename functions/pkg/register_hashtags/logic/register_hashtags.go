@@ -3,7 +3,7 @@ package logic
 import (
 	"os"
 
-	"github.com/tmp-friends/victo-batch/functions/register_hashtags/service"
+	"github.com/tmp-friends/victo-batch/functions/pkg/register_hashtags/service"
 )
 
 type RegisterHashtagsLogic struct {

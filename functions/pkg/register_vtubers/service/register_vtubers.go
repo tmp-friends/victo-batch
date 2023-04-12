@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/sivchari/gotwtr"
-	"github.com/tmp-friends/victo-batch/functions/dto"
-	"github.com/tmp-friends/victo-batch/functions/lib"
-	"github.com/tmp-friends/victo-batch/functions/register_vtubers/dao"
+	"github.com/tmp-friends/victo-batch/functions/pkg/dto"
+	"github.com/tmp-friends/victo-batch/functions/pkg/lib"
+	"github.com/tmp-friends/victo-batch/functions/pkg/register_vtubers/dao"
 )
 
 const REQ_LIMIT = 100

@@ -3,7 +3,7 @@ package logic
 import (
 	"os"
 
-	"github.com/tmp-friends/victo-batch/functions/register_vtubers/service"
+	"github.com/tmp-friends/victo-batch/functions/pkg/register_vtubers/service"
 )
 
 type RegisterVtubersLogic struct {
