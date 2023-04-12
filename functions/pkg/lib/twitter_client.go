@@ -1,5 +1,3 @@
-// Deprecated
-// @see: lib/twitter_scraper.go
 package lib
 
 import (
@@ -36,6 +34,7 @@ func (tc *TwitterClient) GetUsersBy(userNames []string) *gotwtr.UsersResponse {
 	return res
 }
 
+// @deprecated
 func (tc *TwitterClient) SearchRecent(
 	keyword string,
 	startTime time.Time,

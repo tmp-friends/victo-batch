@@ -5,8 +5,8 @@ import (
 	"database/sql"
 
 	twitterscraper "github.com/n0madic/twitter-scraper"
-	"github.com/tmp-friends/victo-batch/functions/config"
 	"github.com/tmp-friends/victo-batch/functions/models"
+	"github.com/tmp-friends/victo-batch/functions/pkg/config"
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -71,5 +71,26 @@ func (ftd *FanartTweetsDao) InsertMediaObject(tweet *twitterscraper.Tweet) {
 		if err != nil {
 			panic(err)
 		}
+	}
+}
+
+func (ftd *FanartTweetsDao) InsertAuthor(author *twitterscraper.Profile) {
+	to := models.Author{
+		ID:              author.UserID,
+		Name:            author.Name,
+		Username:        author.Username,
+		ProfileImageURL: null.StringFrom(author.Avatar),
+		BannerImageURL:  null.StringFrom(author.Banner),
+		Biography:       null.StringFrom(author.Biography),
+		Website:         null.StringFrom(author.Website),
+		FollowersCount:  author.FollowersCount,
+		FollowingCount:  author.FollowingCount,
+		TweetsCount:     author.TweetsCount,
+		Joined:          *author.Joined,
+	}
+
+	err := to.Upsert(context.Background(), ftd.DB, boil.Blacklist("created_at"), boil.Infer())
+	if err != nil {
+		panic(err)
 	}
 }
