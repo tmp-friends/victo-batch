@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"regexp"
 
 	twitterscraper "github.com/n0madic/twitter-scraper"
 	"github.com/tmp-friends/victo-batch/functions/models"
@@ -33,12 +34,26 @@ func (fts *FanartTweetsService) FetchTweets(
 	startTime string,
 	endTime string,
 ) []*twitterscraper.Tweet {
-	keyword := fmt.Sprintf(
-		"\"#%s\" -filter:retweet filter:images since:%s until:%s",
-		hashtagName,
-		startTime,
-		endTime,
-	)
+	// HACK: 数字が含まれていると、ハッシュタグをつけての検索が効かなくなる
+	re := regexp.MustCompile(`\d`)
+	isContainsNumber := re.Match([]byte(hashtagName))
+
+	var keyword string
+	if isContainsNumber {
+		keyword = fmt.Sprintf(
+			"\"%s\" -filter:retweet filter:images since:%s until:%s",
+			hashtagName,
+			startTime,
+			endTime,
+		)
+	} else {
+		keyword = fmt.Sprintf(
+			"\"#%s\" -filter:retweet filter:images since:%s until:%s",
+			hashtagName,
+			startTime,
+			endTime,
+		)
+	}
 
 	tweets := fts.lib.SearchTweets(keyword)
 
