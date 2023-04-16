@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"regexp"
+	"strings"
 
 	twitterscraper "github.com/n0madic/twitter-scraper"
 	"github.com/tmp-friends/victo-batch/functions/models"
@@ -74,9 +75,22 @@ func (fts *FanartTweetsService) GetAuthors(tweets []*twitterscraper.Tweet) []*tw
 
 func (fts *FanartTweetsService) Insert(hashtagId int, tweets []*twitterscraper.Tweet) {
 	for _, t := range tweets {
+		t.Text = fts.extractTweetUrl(t.Text)
+
 		fts.dao.InsertTweetObject(t, hashtagId)
 		fts.dao.InsertMediaObject(t)
 	}
+}
+
+// ツイート本文に含まれているtweet_urlを抽出する処理
+func (fts *FanartTweetsService) extractTweetUrl(text string) string {
+	// https://t.co/<空白以外の一文字以上>
+	re := regexp.MustCompile(`https://t.co/\S*$`)
+	url := re.FindString(text)
+
+	extractedText := strings.Replace(text, url, "", -1)
+
+	return extractedText
 }
 
 func (fts *FanartTweetsService) InsertAuthors(authors []*twitterscraper.Profile) {
